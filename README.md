@@ -6,10 +6,10 @@ Simulating fault tolerance mechanisms (heartbeat detection, leader
 re-election, checkpointing) in a 5–10 node distributed system using
 OMNeT++, for the Algorithmique Distribuée course.
 
+
 ## Setup
-This repo uses a Codespace devcontainer. On first open, build tools
-install automatically; OMNeT++ itself must be downloaded manually
-(see `.devcontainer/setup.sh` output for instructions).
+Requires OMNeT++ 6.4.0 installed locally (all teammates use the same version).
+Clone the repo, then import it into the OMNeT++ IDE as an existing project.
 
 ## Running scenarios
 | Config (`.ini`)          | Fault scenario              |
