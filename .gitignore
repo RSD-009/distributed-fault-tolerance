@@ -1,0 +1,7 @@
+out/
+*.o
+*.obj
+Makefile
+*.vec
+*.sca
+.vscode/
