@@ -2,35 +2,56 @@
 #define NODE_H
 
 #include <omnetpp.h>
+#include <map>
+#include <set>
+#include <vector>
 
 using namespace omnetpp;
 
-// Message kinds exchanged between nodes.
-// Student B: add ELECTION_MSG, COORDINATOR_MSG, CHECKPOINT_MSG here.
 enum MessageKind {
-    HEARTBEAT_PING = 0,
-    HEARTBEAT_ACK = 1
+    INFORM = 0,
+    ACK = 1,
+    RETX_TIMER = 2
 };
 
 class Node : public cSimpleModule
 {
   private:
     int nodeId;
-    simtime_t heartbeatInterval;
+    bool isInitiator;
     simtime_t timeoutValue;
-    cMessage *heartbeatTimer = nullptr;
+    int maxRetries;
+    double msgLossProb;
+    simtime_t crashTime;
+    bool crashed = false;
+    bool informed = false;
 
-    // Student C: add a per-neighbour "suspected" bool array here once
-    // fault injection + timeout checking is wired up.
+    std::vector<int> neighborIds;
+    std::map<int, int> gateForNeighbor;
+
+    std::map<int, std::set<int>> pendingZ;
+    std::map<int, int> retriesSoFar;
+    std::map<int, cMessage *> retxTimer;
+    std::set<int> ackedNeighbors;
+    std::set<int> unreachableNeighbors;
+
+    long messagesSent = 0;
+    long messagesDropped = 0;
 
   protected:
     virtual void initialize() override;
     virtual void handleMessage(cMessage *msg) override;
     virtual void finish() override;
 
-    void sendHeartbeats();
-    void handleHeartbeatPing(cMessage *msg);
-    void handleHeartbeatAck(cMessage *msg);
+    void maybeCrashNow();
+    void buildNeighborTable();
+    void sendInformTo(int neighborId, const std::set<int> &z);
+    void onInformReceived(cMessage *msg);
+    void onAckReceived(cMessage *msg);
+    void onRetxTimer(cMessage *msg);
+
+    static std::string setToStr(const std::set<int> &s);
+    static std::set<int> strToSet(const std::string &s);
 };
 
 #endif

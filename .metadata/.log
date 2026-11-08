@@ -1,0 +1,553 @@
+!SESSION 2026-11-07 18:17:14.829 -----------------------------------------------
+eclipse.buildId=6.4.0.260506-2cf25223fe
+java.version=25.0.3
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=linux, ARCH=x86_64, WS=gtk, NL=en_US
+Command-line arguments:  -os linux -ws gtk -arch x86_64
+
+!ENTRY org.eclipse.e4.ui.css.swt.theme 4 0 2026-11-07 18:18:20.750
+!MESSAGE /css/default.css
+!STACK 0
+java.io.FileNotFoundException: /css/default.css
+	at org.eclipse.osgi.storage.url.bundleentry.Handler.findBundleEntry(Handler.java:55)
+	at org.eclipse.osgi.storage.url.BundleResourceHandler.openConnection(BundleResourceHandler.java:214)
+	at java.base/java.net.URL.openConnection(Unknown Source)
+	at org.eclipse.osgi.storage.url.BundleURLConverter.resolve(BundleURLConverter.java:64)
+	at org.eclipse.core.runtime.FileLocator.resolve(FileLocator.java:301)
+	at org.eclipse.core.internal.runtime.PlatformURLConverter.resolve(PlatformURLConverter.java:57)
+	at org.eclipse.core.runtime.FileLocator.resolve(FileLocator.java:301)
+	at org.eclipse.e4.ui.css.swt.internal.theme.ThemeEngine.setTheme(ThemeEngine.java:466)
+	at org.eclipse.e4.ui.css.swt.internal.theme.ThemeEngine.setTheme(ThemeEngine.java:434)
+	at org.eclipse.e4.ui.css.swt.internal.theme.ThemeEngine.setTheme(ThemeEngine.java:426)
+	at org.eclipse.e4.ui.css.swt.internal.theme.ThemeEngine.restore(ThemeEngine.java:623)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.setCSSTheme(PartRenderingEngine.java:1416)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.initializeStyling(PartRenderingEngine.java:1323)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$5.run(PartRenderingEngine.java:1055)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:339)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.run(PartRenderingEngine.java:1051)
+	at org.eclipse.e4.ui.internal.workbench.E4Workbench.createAndRunUI(E4Workbench.java:153)
+	at org.eclipse.ui.internal.Workbench.lambda$3(Workbench.java:684)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:339)
+	at org.eclipse.ui.internal.Workbench.createAndRunWorkbench(Workbench.java:583)
+	at org.eclipse.ui.PlatformUI.createAndRunWorkbench(PlatformUI.java:173)
+	at org.eclipse.ui.internal.ide.application.IDEApplication.start(IDEApplication.java:185)
+	at org.eclipse.equinox.internal.app.EclipseAppHandle.run(EclipseAppHandle.java:219)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.runApplication(EclipseAppLauncher.java:149)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.start(EclipseAppLauncher.java:115)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:467)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:298)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(Unknown Source)
+	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+	at org.eclipse.equinox.launcher.Main.invokeFramework(Main.java:615)
+	at org.eclipse.equinox.launcher.Main.basicRun(Main.java:563)
+	at org.eclipse.equinox.launcher.Main.run(Main.java:1415)
+	at org.eclipse.equinox.launcher.Main.main(Main.java:1387)
+
+!ENTRY org.omnetpp.common.core 4 0 2026-11-07 18:18:21.856
+!MESSAGE Thread contention monitoring enabled
+
+!ENTRY org.omnetpp.main 1 0 2026-11-07 18:18:21.872
+!MESSAGE OMNeT++ IDE 6.4.0.260506-2cf25223fe started.
+
+!ENTRY org.python.pydev.shared_core 1 1 2026-11-07 18:18:23.941
+!MESSAGE Restoring info for: /home/ilyes/omnetpp-6.4.0/.venv/bin/python3
+
+!ENTRY org.python.pydev.shared_core 1 1 2026-11-07 18:18:24.204
+!MESSAGE Finished restoring information for: /home/ilyes/omnetpp-6.4.0/.venv/bin/python3 at: /home/ilyes/distributed-fault-tolerance/.metadata/.plugins/org.python.pydev/v1_dm7do5uss64gw6dsptuagojjx
+
+!ENTRY org.python.pydev.shared_core 4 4 2026-11-07 18:18:27.888
+!MESSAGE Info: Rebuilding internal caches: /home/ilyes/distributed-fault-tolerance/.metadata/.plugins/org.eclipse.core.resources/.projects/analysis/com.python.pydev.analysis/AdditionalProjectInterpreterInfo.pydevinfo (Expected error to be provided and got no error!)
+
+!ENTRY org.python.pydev.shared_core 4 4 2026-11-07 18:18:27.889
+!MESSAGE Unsupported version:3.14 (falling back to 3.13)
+!STACK 0
+java.lang.RuntimeException: Unsupported version:3.14 (falling back to 3.13)
+	at org.python.pydev.shared_core.log.Log.log(Log.java:38)
+	at org.python.pydev.core.IPythonNature$Versions.convertToInternalVersion(IPythonNature.java:216)
+	at org.python.pydev.plugin.nature.PythonNature.getVersionAndError(PythonNature.java:904)
+	at org.python.pydev.plugin.nature.PythonNature.getVersion(PythonNature.java:859)
+	at org.python.pydev.plugin.nature.PythonNature.getGrammarVersion(PythonNature.java:1227)
+	at com.python.pydev.analysis.additionalinfo.AdditionalProjectInterpreterInfo.recreateAllInfo(AdditionalProjectInterpreterInfo.java:349)
+	at com.python.pydev.analysis.additionalinfo.AdditionalProjectInterpreterInfo.getAdditionalInfoForProject(AdditionalProjectInterpreterInfo.java:250)
+	at com.python.pydev.analysis.additionalinfo.AdditionalProjectInterpreterInfo.recreateAllInfo(AdditionalProjectInterpreterInfo.java:339)
+	at com.python.pydev.analysis.additionalinfo.builders.InterpreterObserver.notifyProjectPythonpathRestored(InterpreterObserver.java:41)
+	at org.python.pydev.plugin.nature.PythonNature$RebuildPythonNatureModules.run(PythonNature.java:204)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+
+!ENTRY org.python.pydev.shared_core 4 4 2026-11-07 18:18:27.924
+!MESSAGE Info: Rebuilding internal caches: /home/ilyes/distributed-fault-tolerance/.metadata/.plugins/org.eclipse.core.resources/.projects/charttemplates/com.python.pydev.analysis/AdditionalProjectInterpreterInfo.pydevinfo (Expected error to be provided and got no error!)
+
+!ENTRY org.python.pydev.shared_core 4 4 2026-11-07 18:18:27.974
+!MESSAGE Info: Rebuilding internal caches: /home/ilyes/distributed-fault-tolerance/.metadata/.plugins/org.eclipse.core.resources/.projects/direct/com.python.pydev.analysis/AdditionalProjectInterpreterInfo.pydevinfo (Expected error to be provided and got no error!)
+
+!ENTRY org.python.pydev.shared_core 4 4 2026-11-07 18:18:28.083
+!MESSAGE Info: Rebuilding internal caches: /home/ilyes/distributed-fault-tolerance/.metadata/.plugins/org.eclipse.core.resources/.projects/main/com.python.pydev.analysis/AdditionalProjectInterpreterInfo.pydevinfo (Expected error to be provided and got no error!)
+
+!ENTRY org.python.pydev.shared_core 4 4 2026-11-07 18:18:28.179
+!MESSAGE Info: Rebuilding internal caches: /home/ilyes/distributed-fault-tolerance/.metadata/.plugins/org.eclipse.core.resources/.projects/resultfiles/com.python.pydev.analysis/AdditionalProjectInterpreterInfo.pydevinfo (Expected error to be provided and got no error!)
+
+!ENTRY org.python.pydev.shared_core 4 4 2026-11-07 18:18:28.299
+!MESSAGE Info: Rebuilding internal caches: /home/ilyes/distributed-fault-tolerance/.metadata/.plugins/org.eclipse.core.resources/.projects/results_api/com.python.pydev.analysis/AdditionalProjectInterpreterInfo.pydevinfo (Expected error to be provided and got no error!)
+
+!ENTRY org.python.pydev.shared_core 4 4 2026-11-07 18:18:29.007
+!MESSAGE Info: Rebuilding internal caches: /home/ilyes/distributed-fault-tolerance/.metadata/.plugins/org.eclipse.core.resources/.projects/indirect/com.python.pydev.analysis/AdditionalProjectInterpreterInfo.pydevinfo (Expected error to be provided and got no error!)
+
+!ENTRY org.omnetpp.main 4 0 2026-11-07 18:18:33.637
+!MESSAGE Cannot download project description from https://models.omnetpp.org/descriptors/omnetpp-6.4/inet.xml
+!STACK 0
+java.io.IOException: Server returned HTTP response code: 403 for URL: https://models.omnetpp.org/descriptors/omnetpp-6.4/inet.xml
+	at java.base/sun.net.www.protocol.http.HttpURLConnection.getInputStream0(Unknown Source)
+	at java.base/sun.net.www.protocol.http.HttpURLConnection.getInputStream(Unknown Source)
+	at java.base/sun.net.www.protocol.https.HttpsURLConnectionImpl.getInputStream(Unknown Source)
+	at java.base/java.net.URL.openStream(Unknown Source)
+	at org.apache.commons.io.FileUtils.copyURLToFile(FileUtils.java:1460)
+	at org.omnetpp.ide.installer.ProjectDescription.downloadToTempFile(ProjectDescription.java:149)
+	at org.omnetpp.ide.installer.ProjectDescription.download(ProjectDescription.java:169)
+	at org.omnetpp.ide.installer.InstallProjectTask.run(InstallProjectTask.java:43)
+	at org.omnetpp.ide.installer.InstallProjectJob.run(InstallProjectJob.java:32)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+
+!ENTRY org.eclipse.cdt.core 1 0 2026-11-07 18:18:42.966
+!MESSAGE Indexed 'embedding' (5 sources, 496 headers) in 11.7 sec: 55,571 declarations; 106,461 references; 0 unresolved inclusions; 181 syntax errors; 2,405 unresolved names (1.5%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2026-11-07 18:18:55.430
+!MESSAGE Indexed 'osg-indoor' (3 sources, 658 headers) in 12.2 sec: 95,925 declarations; 176,649 references; 0 unresolved inclusions; 199 syntax errors; 2,424 unresolved names (0.88%)
+
+!ENTRY org.eclipse.ui.ide 4 0 2026-11-07 18:18:56.071
+!MESSAGE Could not import project located at /home/ilyes/distributed-fault-tolerance
+!STACK 0
+org.eclipse.ui.internal.wizards.datatransfer.CouldNotImportProjectException: Could not import project located at /home/ilyes/distributed-fault-tolerance
+	at org.eclipse.ui.internal.wizards.datatransfer.SmartImportJob.toExistingOrNewProject(SmartImportJob.java:555)
+	at org.eclipse.ui.internal.wizards.datatransfer.SmartImportJob.run(SmartImportJob.java:246)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+Caused by: org.eclipse.core.internal.resources.ResourceException: Invalid project description for project 'distributed-fault-tolerance' at 'file:/home/ilyes/distributed-fault-tolerance' 
+	at org.eclipse.core.internal.resources.Project.checkDescription(Project.java:219)
+	at org.eclipse.core.internal.resources.Project.assertCreateRequirements(Project.java:95)
+	at org.eclipse.core.internal.resources.Project.create(Project.java:316)
+	at org.eclipse.core.internal.resources.Project.create(Project.java:302)
+	at org.eclipse.ui.internal.wizards.datatransfer.SmartImportJob.createOrImportProject(SmartImportJob.java:594)
+	at org.eclipse.ui.internal.wizards.datatransfer.SmartImportJob.toExistingOrNewProject(SmartImportJob.java:542)
+	... 2 more
+
+!ENTRY org.eclipse.cdt.core 1 0 2026-11-07 18:19:03.699
+!MESSAGE Indexed 'queueinglib' (20 sources, 540 headers) in 7.99 sec: 62,981 declarations; 121,110 references; 0 unresolved inclusions; 193 syntax errors; 2,407 unresolved names (1.3%)
+
+!ENTRY org.eclipse.cdt.core 4 0 2026-11-07 18:19:09.077
+!MESSAGE Unexpected overload for binary operator 28: 'operator =='
+
+!ENTRY org.eclipse.cdt.core 4 0 2026-11-07 18:19:09.078
+!MESSAGE Unexpected overload for binary operator 28: 'operator =='
+
+!ENTRY org.eclipse.cdt.core 4 0 2026-11-07 18:19:09.085
+!MESSAGE Unexpected overload for binary operator 28: 'operator =='
+
+!ENTRY org.eclipse.cdt.core 4 0 2026-11-07 18:19:09.087
+!MESSAGE Unexpected overload for binary operator 28: 'operator =='
+
+!ENTRY org.eclipse.cdt.core 4 0 2026-11-07 18:19:09.089
+!MESSAGE Unexpected overload for binary operator 28: 'operator =='
+
+!ENTRY org.eclipse.cdt.core 4 0 2026-11-07 18:19:09.091
+!MESSAGE Unexpected overload for binary operator 28: 'operator =='
+
+!ENTRY org.eclipse.cdt.core 1 0 2026-11-07 18:19:11.601
+!MESSAGE Indexed 'tictoc' (24 sources, 515 headers) in 7.61 sec: 60,388 declarations; 119,966 references; 0 unresolved inclusions; 199 syntax errors; 2,405 unresolved names (1.3%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2026-11-07 18:19:17.461
+!MESSAGE Indexed 'histograms' (1 sources, 494 headers) in 5.6 sec: 55,494 declarations; 106,431 references; 0 unresolved inclusions; 181 syntax errors; 2,405 unresolved names (1.5%)
+
+!ENTRY org.eclipse.cdt.core 4 0 2026-11-07 18:19:25.813
+!MESSAGE Unexpected overload for binary operator 5: 'operator -'
+
+!ENTRY org.eclipse.cdt.core 1 0 2026-11-07 18:19:26.910
+!MESSAGE Indexed 'osg-earth' (6 sources, 675 headers) in 9.09 sec: 96,788 declarations; 179,011 references; 21 unresolved inclusions; 199 syntax errors; 2,659 unresolved names (0.95%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2026-11-07 18:19:33.347
+!MESSAGE Indexed 'routing' (6 sources, 515 headers) in 6.09 sec: 59,267 declarations; 115,117 references; 0 unresolved inclusions; 193 syntax errors; 2,407 unresolved names (1.4%)
+!SESSION 2026-11-07 18:23:33.003 -----------------------------------------------
+eclipse.buildId=6.4.0.260506-2cf25223fe
+java.version=25.0.3
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=linux, ARCH=x86_64, WS=gtk, NL=en_US
+Command-line arguments:  -os linux -ws gtk -arch x86_64
+
+!ENTRY org.eclipse.e4.ui.css.swt.theme 4 0 2026-11-07 18:23:40.487
+!MESSAGE /css/default.css
+!STACK 0
+java.io.FileNotFoundException: /css/default.css
+	at org.eclipse.osgi.storage.url.bundleentry.Handler.findBundleEntry(Handler.java:55)
+	at org.eclipse.osgi.storage.url.BundleResourceHandler.openConnection(BundleResourceHandler.java:214)
+	at java.base/java.net.URL.openConnection(Unknown Source)
+	at org.eclipse.osgi.storage.url.BundleURLConverter.resolve(BundleURLConverter.java:64)
+	at org.eclipse.core.runtime.FileLocator.resolve(FileLocator.java:301)
+	at org.eclipse.core.internal.runtime.PlatformURLConverter.resolve(PlatformURLConverter.java:57)
+	at org.eclipse.core.runtime.FileLocator.resolve(FileLocator.java:301)
+	at org.eclipse.e4.ui.css.swt.internal.theme.ThemeEngine.setTheme(ThemeEngine.java:466)
+	at org.eclipse.e4.ui.css.swt.internal.theme.ThemeEngine.setTheme(ThemeEngine.java:434)
+	at org.eclipse.e4.ui.css.swt.internal.theme.ThemeEngine.setTheme(ThemeEngine.java:426)
+	at org.eclipse.e4.ui.css.swt.internal.theme.ThemeEngine.restore(ThemeEngine.java:623)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.setCSSTheme(PartRenderingEngine.java:1416)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.initializeStyling(PartRenderingEngine.java:1323)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$5.run(PartRenderingEngine.java:1055)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:339)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.run(PartRenderingEngine.java:1051)
+	at org.eclipse.e4.ui.internal.workbench.E4Workbench.createAndRunUI(E4Workbench.java:153)
+	at org.eclipse.ui.internal.Workbench.lambda$3(Workbench.java:684)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:339)
+	at org.eclipse.ui.internal.Workbench.createAndRunWorkbench(Workbench.java:583)
+	at org.eclipse.ui.PlatformUI.createAndRunWorkbench(PlatformUI.java:173)
+	at org.eclipse.ui.internal.ide.application.IDEApplication.start(IDEApplication.java:185)
+	at org.eclipse.equinox.internal.app.EclipseAppHandle.run(EclipseAppHandle.java:219)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.runApplication(EclipseAppLauncher.java:149)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.start(EclipseAppLauncher.java:115)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:467)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:298)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(Unknown Source)
+	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+	at org.eclipse.equinox.launcher.Main.invokeFramework(Main.java:615)
+	at org.eclipse.equinox.launcher.Main.basicRun(Main.java:563)
+	at org.eclipse.equinox.launcher.Main.run(Main.java:1415)
+	at org.eclipse.equinox.launcher.Main.main(Main.java:1387)
+
+!ENTRY org.python.pydev.shared_core 4 4 2026-11-07 18:23:42.437
+!MESSAGE Unsupported version:3.14 (falling back to 3.13)
+!STACK 0
+java.lang.RuntimeException: Unsupported version:3.14 (falling back to 3.13)
+	at org.python.pydev.shared_core.log.Log.log(Log.java:38)
+	at org.python.pydev.core.IPythonNature$Versions.convertToInternalVersion(IPythonNature.java:216)
+	at org.python.pydev.plugin.nature.PythonNature.getVersionAndError(PythonNature.java:904)
+	at org.python.pydev.navigator.ProjectInfoForPackageExplorer.getConfigErrorsAndInfo(ProjectInfoForPackageExplorer.java:336)
+	at org.python.pydev.navigator.ProjectInfoForPackageExplorer.getConfigErrorsAndInfo(ProjectInfoForPackageExplorer.java:244)
+	at org.python.pydev.navigator.ProjectInfoForPackageExplorer.recreateInfo(ProjectInfoForPackageExplorer.java:120)
+	at org.python.pydev.navigator.ProjectInfoForPackageExplorer.<init>(ProjectInfoForPackageExplorer.java:111)
+	at org.python.pydev.navigator.ProjectInfoForPackageExplorer.getProjectInfo(ProjectInfoForPackageExplorer.java:74)
+	at org.python.pydev.navigator.PythonBaseModelProvider.getProjectSourceFolders(PythonBaseModelProvider.java:421)
+	at org.python.pydev.navigator.PythonBaseModelProvider.getResourceInPythonModel(PythonBaseModelProvider.java:386)
+	at org.python.pydev.navigator.PythonBaseModelProvider.getResourceInPythonModel(PythonBaseModelProvider.java:371)
+	at org.python.pydev.navigator.PythonModelProvider.wrapChildren(PythonModelProvider.java:475)
+	at org.python.pydev.navigator.PythonModelProvider.convertToPythonElementsAddOrRemove(PythonModelProvider.java:383)
+	at org.python.pydev.navigator.PythonModelProvider.getPipelinedChildren(PythonModelProvider.java:141)
+	at org.python.pydev.navigator.PythonModelProvider.getPipelinedElements(PythonModelProvider.java:171)
+	at org.eclipse.ui.internal.navigator.extensions.SafeDelegateTreeContentProvider.getPipelinedElements(SafeDelegateTreeContentProvider.java:178)
+	at org.eclipse.ui.internal.navigator.NavigatorContentServiceContentProvider.pipelineChildren(NavigatorContentServiceContentProvider.java:211)
+	at org.eclipse.ui.internal.navigator.NavigatorContentServiceContentProvider$1.run(NavigatorContentServiceContentProvider.java:169)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:47)
+	at org.eclipse.ui.internal.navigator.NavigatorContentServiceContentProvider.internalGetChildren(NavigatorContentServiceContentProvider.java:145)
+	at org.eclipse.ui.internal.navigator.NavigatorContentServiceContentProvider.getElements(NavigatorContentServiceContentProvider.java:118)
+	at org.eclipse.jface.viewers.StructuredViewer.getRawChildren(StructuredViewer.java:943)
+	at org.eclipse.jface.viewers.ColumnViewer.getRawChildren(ColumnViewer.java:704)
+	at org.eclipse.jface.viewers.AbstractTreeViewer.getRawChildren(AbstractTreeViewer.java:1456)
+	at org.eclipse.jface.viewers.TreeViewer.getRawChildren(TreeViewer.java:353)
+	at org.eclipse.jface.viewers.StructuredViewer.getFilteredChildren(StructuredViewer.java:851)
+	at org.eclipse.jface.viewers.AbstractTreeViewer.getSortedChildren(AbstractTreeViewer.java:671)
+	at org.eclipse.jface.viewers.AbstractTreeViewer.createChildren(AbstractTreeViewer.java:866)
+	at org.eclipse.jface.viewers.TreeViewer.createChildren(TreeViewer.java:612)
+	at org.eclipse.jface.viewers.AbstractTreeViewer.createChildren(AbstractTreeViewer.java:817)
+	at org.eclipse.jface.viewers.AbstractTreeViewer.internalInitializeTree(AbstractTreeViewer.java:1646)
+	at org.eclipse.jface.viewers.TreeViewer.internalInitializeTree(TreeViewer.java:781)
+	at org.eclipse.jface.viewers.AbstractTreeViewer.lambda$2(AbstractTreeViewer.java:1631)
+	at org.eclipse.jface.viewers.StructuredViewer.preservingSelection(StructuredViewer.java:1395)
+	at org.eclipse.jface.viewers.TreeViewer.preservingSelection(TreeViewer.java:368)
+	at org.eclipse.jface.viewers.StructuredViewer.preservingSelection(StructuredViewer.java:1356)
+	at org.eclipse.jface.viewers.AbstractTreeViewer.inputChanged(AbstractTreeViewer.java:1625)
+	at org.eclipse.jface.viewers.ContentViewer.setInput(ContentViewer.java:279)
+	at org.eclipse.jface.viewers.StructuredViewer.setInput(StructuredViewer.java:1639)
+	at org.eclipse.ui.navigator.CommonNavigator.createPartControl(CommonNavigator.java:201)
+	at org.eclipse.ui.navigator.resources.ProjectExplorer.createPartControl(ProjectExplorer.java:160)
+	at org.eclipse.ui.internal.e4.compatibility.CompatibilityPart.createPartControl(CompatibilityPart.java:160)
+	at org.eclipse.ui.internal.e4.compatibility.CompatibilityView.createPartControl(CompatibilityView.java:154)
+	at org.eclipse.ui.internal.e4.compatibility.CompatibilityPart.create(CompatibilityPart.java:367)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(Unknown Source)
+	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+	at org.eclipse.e4.core.internal.di.MethodRequestor.execute(MethodRequestor.java:58)
+	at org.eclipse.e4.core.internal.di.InjectorImpl.processAnnotated(InjectorImpl.java:1037)
+	at org.eclipse.e4.core.internal.di.InjectorImpl.processAnnotated(InjectorImpl.java:998)
+	at org.eclipse.e4.core.internal.di.InjectorImpl.internalInject(InjectorImpl.java:142)
+	at org.eclipse.e4.core.internal.di.InjectorImpl.internalMake(InjectorImpl.java:401)
+	at org.eclipse.e4.core.internal.di.InjectorImpl.make(InjectorImpl.java:319)
+	at org.eclipse.e4.core.contexts.ContextInjectionFactory.make(ContextInjectionFactory.java:203)
+	at org.eclipse.e4.ui.internal.workbench.ReflectionContributionFactory.createFromBundle(ReflectionContributionFactory.java:90)
+	at org.eclipse.e4.ui.internal.workbench.ReflectionContributionFactory.doCreate(ReflectionContributionFactory.java:59)
+	at org.eclipse.e4.ui.internal.workbench.ReflectionContributionFactory.create(ReflectionContributionFactory.java:42)
+	at org.eclipse.ui.internal.WorkbenchContributionFactory.create(WorkbenchContributionFactory.java:46)
+	at org.eclipse.e4.ui.workbench.renderers.swt.ContributedPartRenderer.createWidget(ContributedPartRenderer.java:133)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.createWidget(PartRenderingEngine.java:1000)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:671)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$1.run(PartRenderingEngine.java:543)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:47)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.createGui(PartRenderingEngine.java:527)
+	at org.eclipse.e4.ui.workbench.renderers.swt.ElementReferenceRenderer.createWidget(ElementReferenceRenderer.java:74)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.createWidget(PartRenderingEngine.java:1000)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:671)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:775)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$2.run(PartRenderingEngine.java:739)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:47)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.createGui(PartRenderingEngine.java:723)
+	at org.eclipse.e4.ui.workbench.renderers.swt.StackRenderer.showTab(StackRenderer.java:1492)
+	at org.eclipse.e4.ui.workbench.renderers.swt.LazyStackRenderer.postProcess(LazyStackRenderer.java:114)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:689)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:775)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$2.run(PartRenderingEngine.java:739)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:47)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.createGui(PartRenderingEngine.java:723)
+	at org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer.processContents(SWTPartRenderer.java:73)
+	at org.eclipse.e4.ui.workbench.renderers.swt.SashRenderer.processContents(SashRenderer.java:148)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:685)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:775)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$2.run(PartRenderingEngine.java:739)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:47)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.createGui(PartRenderingEngine.java:723)
+	at org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer.processContents(SWTPartRenderer.java:73)
+	at org.eclipse.e4.ui.workbench.renderers.swt.SashRenderer.processContents(SashRenderer.java:148)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:685)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:775)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$2.run(PartRenderingEngine.java:739)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:47)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.createGui(PartRenderingEngine.java:723)
+	at org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer.processContents(SWTPartRenderer.java:73)
+	at org.eclipse.e4.ui.workbench.renderers.swt.PerspectiveRenderer.processContents(PerspectiveRenderer.java:49)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:685)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:775)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$2.run(PartRenderingEngine.java:739)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:47)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.createGui(PartRenderingEngine.java:723)
+	at org.eclipse.e4.ui.workbench.renderers.swt.PerspectiveStackRenderer.showTab(PerspectiveStackRenderer.java:80)
+	at org.eclipse.e4.ui.workbench.renderers.swt.LazyStackRenderer.postProcess(LazyStackRenderer.java:114)
+	at org.eclipse.e4.ui.workbench.renderers.swt.PerspectiveStackRenderer.postProcess(PerspectiveStackRenderer.java:62)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:689)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:775)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$2.run(PartRenderingEngine.java:739)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:47)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.createGui(PartRenderingEngine.java:723)
+	at org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer.processContents(SWTPartRenderer.java:73)
+	at org.eclipse.e4.ui.workbench.renderers.swt.SashRenderer.processContents(SashRenderer.java:148)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:685)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:775)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$2.run(PartRenderingEngine.java:739)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:47)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.createGui(PartRenderingEngine.java:723)
+	at org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer.processContents(SWTPartRenderer.java:73)
+	at org.eclipse.e4.ui.workbench.renderers.swt.WBWRenderer.processContents(WBWRenderer.java:651)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:685)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:775)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$2.run(PartRenderingEngine.java:739)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:47)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.createGui(PartRenderingEngine.java:723)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$5.run(PartRenderingEngine.java:1088)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:339)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.run(PartRenderingEngine.java:1051)
+	at org.eclipse.e4.ui.internal.workbench.E4Workbench.createAndRunUI(E4Workbench.java:153)
+	at org.eclipse.ui.internal.Workbench.lambda$3(Workbench.java:684)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:339)
+	at org.eclipse.ui.internal.Workbench.createAndRunWorkbench(Workbench.java:583)
+	at org.eclipse.ui.PlatformUI.createAndRunWorkbench(PlatformUI.java:173)
+	at org.eclipse.ui.internal.ide.application.IDEApplication.start(IDEApplication.java:185)
+	at org.eclipse.equinox.internal.app.EclipseAppHandle.run(EclipseAppHandle.java:219)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.runApplication(EclipseAppLauncher.java:149)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.start(EclipseAppLauncher.java:115)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:467)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:298)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(Unknown Source)
+	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+	at org.eclipse.equinox.launcher.Main.invokeFramework(Main.java:615)
+	at org.eclipse.equinox.launcher.Main.basicRun(Main.java:563)
+	at org.eclipse.equinox.launcher.Main.run(Main.java:1415)
+	at org.eclipse.equinox.launcher.Main.main(Main.java:1387)
+
+!ENTRY org.omnetpp.common.core 4 0 2026-11-07 18:23:43.774
+!MESSAGE Thread contention monitoring enabled
+
+!ENTRY org.omnetpp.main 1 0 2026-11-07 18:23:43.793
+!MESSAGE OMNeT++ IDE 6.4.0.260506-2cf25223fe started.
+
+!ENTRY org.python.pydev.shared_core 4 4 2026-11-07 18:24:13.949
+!MESSAGE Info: Rebuilding internal caches: /home/ilyes/distributed-fault-tolerance/.metadata/.plugins/com.python.pydev.analysis/python_v1_dm7do5uss64gw6dsptuagojjx/python.pydevsysteminfo (Expected error to be provided and got no error!)
+
+!ENTRY org.eclipse.ui 4 4 2026-11-07 18:24:27.621
+!MESSAGE Unable to create part
+!STACK 1
+Please make sure the project is open before trying to open a file in it.!SUBENTRY 1 org.eclipse.ui 4 0 2026-11-07 18:24:27.621
+!MESSAGE Invalid input, it must be a file in the workspace: Network.ned
+
+!ENTRY org.eclipse.cdt.core 4 0 2026-11-07 18:24:41.506
+!MESSAGE Unexpected overload for binary operator 28: 'operator =='
+
+!ENTRY org.eclipse.cdt.core 4 0 2026-11-07 18:24:41.510
+!MESSAGE Unexpected overload for binary operator 28: 'operator =='
+
+!ENTRY org.eclipse.cdt.core 4 0 2026-11-07 18:24:41.512
+!MESSAGE Unexpected overload for binary operator 28: 'operator =='
+
+!ENTRY org.eclipse.cdt.core 4 0 2026-11-07 18:24:41.515
+!MESSAGE Unexpected overload for binary operator 28: 'operator =='
+
+!ENTRY org.eclipse.cdt.core 4 0 2026-11-07 18:24:41.532
+!MESSAGE Unexpected overload for binary operator 28: 'operator =='
+
+!ENTRY org.eclipse.cdt.core 4 0 2026-11-07 18:24:41.557
+!MESSAGE Unexpected overload for binary operator 28: 'operator =='
+
+!ENTRY org.eclipse.ui 4 4 2026-11-07 18:24:44.874
+!MESSAGE Unable to create part
+!STACK 1
+Please make sure the project is open before trying to open a file in it.!SUBENTRY 1 org.eclipse.ui 4 0 2026-11-07 18:24:44.874
+!MESSAGE Invalid input, it must be a file in the workspace: Node.ned
+
+!ENTRY org.eclipse.ui 4 4 2026-11-07 18:24:45.149
+!MESSAGE Unable to create part
+!STACK 1
+Please make sure the project is open before trying to open a file in it.!SUBENTRY 1 org.eclipse.ui 4 0 2026-11-07 18:24:45.149
+!MESSAGE Invalid input, it must be a file in the workspace: omnetpp.ini
+
+!ENTRY org.eclipse.e4.ui.workbench 4 0 2026-11-07 18:24:45.178
+!MESSAGE Cannot invoke "org.omnetpp.inifile.core.model.InifileAnalyzer.dispose()" because the return value of "org.omnetpp.inifile.editor.editors.InifileEditorData.getInifileAnalyzer()" is null
+!STACK 0
+java.lang.NullPointerException: Cannot invoke "org.omnetpp.inifile.core.model.InifileAnalyzer.dispose()" because the return value of "org.omnetpp.inifile.editor.editors.InifileEditorData.getInifileAnalyzer()" is null
+	at org.omnetpp.inifile.editor.editors.InifileEditor.dispose(InifileEditor.java:290)
+	at org.eclipse.ui.internal.e4.compatibility.CompatibilityPart.handlePartInitException(CompatibilityPart.java:316)
+	at org.eclipse.ui.internal.e4.compatibility.CompatibilityPart.create(CompatibilityPart.java:348)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(Unknown Source)
+	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+	at org.eclipse.e4.core.internal.di.MethodRequestor.execute(MethodRequestor.java:58)
+	at org.eclipse.e4.core.internal.di.InjectorImpl.processAnnotated(InjectorImpl.java:1037)
+	at org.eclipse.e4.core.internal.di.InjectorImpl.processAnnotated(InjectorImpl.java:998)
+	at org.eclipse.e4.core.internal.di.InjectorImpl.internalInject(InjectorImpl.java:142)
+	at org.eclipse.e4.core.internal.di.InjectorImpl.internalMake(InjectorImpl.java:401)
+	at org.eclipse.e4.core.internal.di.InjectorImpl.make(InjectorImpl.java:319)
+	at org.eclipse.e4.core.contexts.ContextInjectionFactory.make(ContextInjectionFactory.java:203)
+	at org.eclipse.e4.ui.internal.workbench.ReflectionContributionFactory.createFromBundle(ReflectionContributionFactory.java:90)
+	at org.eclipse.e4.ui.internal.workbench.ReflectionContributionFactory.doCreate(ReflectionContributionFactory.java:59)
+	at org.eclipse.e4.ui.internal.workbench.ReflectionContributionFactory.create(ReflectionContributionFactory.java:42)
+	at org.eclipse.ui.internal.WorkbenchContributionFactory.create(WorkbenchContributionFactory.java:46)
+	at org.eclipse.e4.ui.workbench.renderers.swt.ContributedPartRenderer.createWidget(ContributedPartRenderer.java:133)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.createWidget(PartRenderingEngine.java:1000)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:671)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.safeCreateGui(PartRenderingEngine.java:775)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$2.run(PartRenderingEngine.java:739)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:47)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.createGui(PartRenderingEngine.java:723)
+	at org.eclipse.e4.ui.internal.workbench.PartServiceImpl.lambda$0(PartServiceImpl.java:105)
+	at org.eclipse.e4.ui.services.internal.events.UIEventHandler.lambda$0(UIEventHandler.java:38)
+	at org.eclipse.swt.widgets.Synchronizer.syncExec(Synchronizer.java:183)
+	at org.eclipse.ui.internal.UISynchronizer.syncExec(UISynchronizer.java:136)
+	at org.eclipse.swt.widgets.Display.syncExec(Display.java:5950)
+	at org.eclipse.e4.ui.workbench.swt.DisplayUISynchronize.syncExec(DisplayUISynchronize.java:34)
+	at org.eclipse.e4.ui.services.internal.events.UIEventHandler.handleEvent(UIEventHandler.java:38)
+	at org.eclipse.equinox.internal.event.EventHandlerWrapper.handleEvent(EventHandlerWrapper.java:206)
+	at org.eclipse.equinox.internal.event.EventHandlerTracker.dispatchEvent(EventHandlerTracker.java:201)
+	at org.eclipse.equinox.internal.event.EventHandlerTracker.dispatchEvent(EventHandlerTracker.java:1)
+	at org.eclipse.osgi.framework.eventmgr.EventManager.dispatchEvent(EventManager.java:230)
+	at org.eclipse.osgi.framework.eventmgr.ListenerQueue.dispatchEventSynchronous(ListenerQueue.java:151)
+	at org.eclipse.equinox.internal.event.EventAdminImpl.dispatchEvent(EventAdminImpl.java:132)
+	at org.eclipse.equinox.internal.event.EventAdminImpl.sendEvent(EventAdminImpl.java:73)
+	at org.eclipse.equinox.internal.event.EventComponent.sendEvent(EventComponent.java:48)
+	at org.eclipse.e4.ui.services.internal.events.EventBroker.send(EventBroker.java:55)
+	at org.eclipse.e4.ui.internal.workbench.UIEventPublisher.notifyChanged(UIEventPublisher.java:61)
+	at org.eclipse.emf.common.notify.impl.BasicNotifierImpl.eNotify(BasicNotifierImpl.java:424)
+	at org.eclipse.e4.ui.model.application.ui.impl.ElementContainerImpl.setSelectedElementGen(ElementContainerImpl.java:168)
+	at org.eclipse.e4.ui.model.application.ui.impl.ElementContainerImpl.setSelectedElement(ElementContainerImpl.java:187)
+	at org.eclipse.e4.ui.internal.workbench.ModelServiceImpl.showElementInWindow(ModelServiceImpl.java:650)
+	at org.eclipse.e4.ui.internal.workbench.ModelServiceImpl.bringToTop(ModelServiceImpl.java:614)
+	at org.eclipse.e4.ui.internal.workbench.PartServiceImpl.delegateBringToTop(PartServiceImpl.java:805)
+	at org.eclipse.e4.ui.internal.workbench.PartServiceImpl.showPart(PartServiceImpl.java:1275)
+	at org.eclipse.ui.internal.WorkbenchPage.busyOpenEditor(WorkbenchPage.java:3221)
+	at org.eclipse.ui.internal.WorkbenchPage.lambda$11(WorkbenchPage.java:3111)
+	at org.eclipse.swt.custom.BusyIndicator.showWhile(BusyIndicator.java:67)
+	at org.eclipse.ui.internal.WorkbenchPage.openEditor(WorkbenchPage.java:3109)
+	at org.eclipse.ui.internal.WorkbenchPage.openEditor(WorkbenchPage.java:3079)
+	at org.eclipse.ui.internal.WorkbenchPage.openEditor(WorkbenchPage.java:3062)
+	at org.eclipse.ui.ide.IDE.openEditorOnFileStore(IDE.java:1342)
+	at org.eclipse.ui.internal.ide.actions.OpenLocalFileAction.run(OpenLocalFileAction.java:95)
+	at org.eclipse.ui.internal.ide.actions.OpenLocalFileAction.run(OpenLocalFileAction.java:68)
+	at org.eclipse.ui.internal.PluginAction.runWithEvent(PluginAction.java:239)
+	at org.eclipse.ui.internal.WWinPluginAction.runWithEvent(WWinPluginAction.java:218)
+	at org.eclipse.jface.action.ActionContributionItem.handleWidgetSelection(ActionContributionItem.java:581)
+	at org.eclipse.jface.action.ActionContributionItem.lambda$4(ActionContributionItem.java:415)
+	at org.eclipse.swt.widgets.EventTable.sendEvent(EventTable.java:91)
+	at org.eclipse.swt.widgets.Display.sendEvent(Display.java:5845)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1656)
+	at org.eclipse.swt.widgets.Display.runDeferredEvents(Display.java:5060)
+	at org.eclipse.swt.widgets.Display.readAndDispatch(Display.java:4497)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$5.run(PartRenderingEngine.java:1160)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:339)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.run(PartRenderingEngine.java:1051)
+	at org.eclipse.e4.ui.internal.workbench.E4Workbench.createAndRunUI(E4Workbench.java:153)
+	at org.eclipse.ui.internal.Workbench.lambda$3(Workbench.java:684)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:339)
+	at org.eclipse.ui.internal.Workbench.createAndRunWorkbench(Workbench.java:583)
+	at org.eclipse.ui.PlatformUI.createAndRunWorkbench(PlatformUI.java:173)
+	at org.eclipse.ui.internal.ide.application.IDEApplication.start(IDEApplication.java:185)
+	at org.eclipse.equinox.internal.app.EclipseAppHandle.run(EclipseAppHandle.java:219)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.runApplication(EclipseAppLauncher.java:149)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.start(EclipseAppLauncher.java:115)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:467)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:298)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(Unknown Source)
+	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+	at org.eclipse.equinox.launcher.Main.invokeFramework(Main.java:615)
+	at org.eclipse.equinox.launcher.Main.basicRun(Main.java:563)
+	at org.eclipse.equinox.launcher.Main.run(Main.java:1415)
+	at org.eclipse.equinox.launcher.Main.main(Main.java:1387)
+
+!ENTRY org.eclipse.cdt.core 4 0 2026-11-07 18:24:50.290
+!MESSAGE Unexpected overload for binary operator 28: 'operator =='
+
+!ENTRY org.eclipse.cdt.core 4 0 2026-11-07 18:24:50.294
+!MESSAGE Unexpected overload for binary operator 28: 'operator =='
+
+!ENTRY org.eclipse.cdt.core 4 0 2026-11-07 18:24:50.294
+!MESSAGE Unexpected overload for binary operator 28: 'operator =='
+
+!ENTRY org.eclipse.cdt.core 4 0 2026-11-07 18:24:50.324
+!MESSAGE Unexpected overload for binary operator 28: 'operator =='
+
+!ENTRY org.eclipse.cdt.core 4 0 2026-11-07 18:24:50.326
+!MESSAGE Unexpected overload for binary operator 28: 'operator =='
+
+!ENTRY org.eclipse.cdt.core 4 0 2026-11-07 18:24:50.334
+!MESSAGE Unexpected overload for binary operator 28: 'operator =='
+
+!ENTRY org.eclipse.cdt.core 4 0 2026-11-07 18:25:38.635
+!MESSAGE Unexpected overload for binary operator 5: 'operator -'
+
+!ENTRY org.eclipse.cdt.core 4 0 2026-11-07 18:25:43.959
+!MESSAGE Unexpected overload for binary operator 28: 'operator =='
+
+!ENTRY org.eclipse.cdt.core 4 0 2026-11-07 18:25:43.961
+!MESSAGE Unexpected overload for binary operator 28: 'operator =='
+
+!ENTRY org.eclipse.cdt.core 4 0 2026-11-07 18:25:43.970
+!MESSAGE Unexpected overload for binary operator 28: 'operator =='
+
+!ENTRY org.eclipse.cdt.core 4 0 2026-11-07 18:25:43.972
+!MESSAGE Unexpected overload for binary operator 28: 'operator =='
+
+!ENTRY org.eclipse.cdt.core 4 0 2026-11-07 18:25:43.976
+!MESSAGE Unexpected overload for binary operator 28: 'operator =='
+
+!ENTRY org.eclipse.cdt.core 4 0 2026-11-07 18:25:43.980
+!MESSAGE Unexpected overload for binary operator 28: 'operator =='
+
+!ENTRY org.eclipse.cdt.core 4 0 2026-11-07 18:25:45.487
+!MESSAGE Unexpected overload for binary operator 5: 'operator -'
+
+!ENTRY org.eclipse.cdt.core 4 0 2026-11-07 18:25:45.621
+!MESSAGE Unexpected overload for binary operator 5: 'operator -'
+
+!ENTRY org.eclipse.cdt.core 4 0 2026-11-07 18:26:01.261
+!MESSAGE Unexpected overload for binary operator 28: 'operator =='
+
+!ENTRY org.eclipse.cdt.core 4 0 2026-11-07 18:26:01.272
+!MESSAGE Unexpected overload for binary operator 28: 'operator =='
+
+!ENTRY org.eclipse.cdt.core 4 0 2026-11-07 18:26:01.272
+!MESSAGE Unexpected overload for binary operator 28: 'operator =='
+
+!ENTRY org.eclipse.cdt.core 4 0 2026-11-07 18:26:01.273
+!MESSAGE Unexpected overload for binary operator 28: 'operator =='
+
+!ENTRY org.eclipse.cdt.core 4 0 2026-11-07 18:26:01.276
+!MESSAGE Unexpected overload for binary operator 28: 'operator =='
+
+!ENTRY org.eclipse.cdt.core 4 0 2026-11-07 18:26:01.277
+!MESSAGE Unexpected overload for binary operator 28: 'operator =='
