@@ -5,3 +5,6 @@ Makefile
 *.vec
 *.sca
 .vscode/
+dft
+/distributed-fault-tolerance
+/distributed-fault-tolerance_dbg

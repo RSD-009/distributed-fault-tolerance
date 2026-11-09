@@ -4,7 +4,7 @@
 
 Define_Module(Node);
 
-// ---- small helpers for serializing the Z set onto a message par ----
+// ---- helpers: turn the set Z into text and back (to put it in a message) ----
 std::string Node::setToStr(const std::set<int> &s)
 {
     std::ostringstream oss;
@@ -45,10 +45,25 @@ void Node::initialize()
     msgLossProb = par("msgLossProb");
     crashTime = par("crashTime");
 
+    // NEW: read the partition settings
+    partitionPeer = par("partitionPeer");
+    partitionStart = par("partitionStart");
+    partitionEnd = par("partitionEnd");
+    silentStart = par("silentStart");
+    silentEnd = par("silentEnd");
+
     buildNeighborTable();
+
+    // if this node must crash, schedule the crash for crashTime
+    if (crashTime >= SIMTIME_ZERO) {
+        crashEvent = new cMessage("crash", CRASH_EVENT);
+        scheduleAt(crashTime, crashEvent);
+    }
 
     if (isInitiator) {
         informed = true;
+        getDisplayString().setTagArg("i", 1, "green");
+        getDisplayString().setTagArg("i", 2, "60");
         std::set<int> z(neighborIds.begin(), neighborIds.end());
         z.insert(nodeId);
         for (int n : neighborIds)
@@ -57,14 +72,25 @@ void Node::initialize()
     }
 }
 
-void Node::maybeCrashNow()
+// called by the crash event, so it always runs at crashTime
+void Node::crashNow()
 {
-    if (!crashed && crashTime >= SIMTIME_ZERO && simTime() >= crashTime) {
-        crashed = true;
-        EV_INFO << "Node " << nodeId << ": CRASHED at t=" << simTime() << "\n";
-        for (auto &kv : retxTimer)
-            cancelEvent(kv.second);
-    }
+    crashed = true;
+    getDisplayString().setTagArg("i", 1, "red");
+    getDisplayString().setTagArg("i", 2, "80");
+    bubble("CRASHED!");
+    EV_INFO << "Node " << nodeId << ": CRASHED at t=" << simTime() << "\n";
+    for (auto &kv : retxTimer)
+        cancelEvent(kv.second);   // a dead node stops its timers
+}
+
+// NEW: the link to 'neighborId' is cut if it is the partition peer
+// AND the current time is inside [partitionStart, partitionEnd)
+bool Node::linkIsCut(int neighborId)
+{
+    if (neighborId != partitionPeer) return false;
+    if (partitionStart < SIMTIME_ZERO) return false;
+    return simTime() >= partitionStart && simTime() < partitionEnd;
 }
 
 void Node::sendInformTo(int neighborId, const std::set<int> &z)
@@ -76,7 +102,11 @@ void Node::sendInformTo(int neighborId, const std::set<int> &z)
     msg->addPar("senderId") = nodeId;
     msg->addPar("zset") = setToStr(z).c_str();
 
-    if (uniform(0, 1) < msgLossProb) {
+    if (linkIsCut(neighborId)) {                       // NEW
+        messagesCut++;
+        EV_WARN << "Node " << nodeId << ": PARTITION blocks message to " << neighborId << ".\n";
+        delete msg;
+    } else if (uniform(0, 1) < msgLossProb) {
         messagesDropped++;
         EV_WARN << "Node " << nodeId << ": message to " << neighborId << " LOST (simulated).\n";
         delete msg;
@@ -110,8 +140,13 @@ void Node::onRetxTimer(cMessage *msg)
         cMessage *retry = new cMessage("INFORM", INFORM);
         retry->addPar("senderId") = nodeId;
         retry->addPar("zset") = setToStr(pendingZ[neighborId]).c_str();
-        if (uniform(0, 1) < msgLossProb) {
+        if (linkIsCut(neighborId)) {                   // NEW
+            messagesCut++;
+            EV_WARN << "Node " << nodeId << ": PARTITION blocks retry to " << neighborId << ".\n";
+            delete retry;
+        } else if (uniform(0, 1) < msgLossProb) {
             messagesDropped++;
+            EV_WARN << "Node " << nodeId << ": RETRY to " << neighborId << " LOST (simulated).\n";
             delete retry;
         } else {
             send(retry, "out", gateForNeighbor[neighborId]);
@@ -133,11 +168,16 @@ void Node::onInformReceived(cMessage *msg)
     cMessage *ack = new cMessage("ACK", ACK);
     ack->addPar("senderId") = nodeId;
     if (gateForNeighbor.count(senderId)) {
-        if (uniform(0, 1) >= msgLossProb) {
+        if (linkIsCut(senderId)) {                     // NEW
+            messagesCut++;
+            EV_WARN << "Node " << nodeId << ": PARTITION blocks ACK to " << senderId << ".\n";
+            delete ack;
+        } else if (uniform(0, 1) >= msgLossProb) {
             send(ack, "out", gateForNeighbor[senderId]);
             messagesSent++;
         } else {
             messagesDropped++;
+            EV_WARN << "Node " << nodeId << ": ACK to " << senderId << " LOST (simulated).\n";
             delete ack;
         }
     } else {
@@ -146,6 +186,8 @@ void Node::onInformReceived(cMessage *msg)
 
     if (!informed) {
         informed = true;
+        getDisplayString().setTagArg("i", 1, "green");
+        getDisplayString().setTagArg("i", 2, "60");
         EV_INFO << "Node " << nodeId << ": INFORMED (via " << senderId << ")\n";
 
         std::vector<int> y;
@@ -172,8 +214,24 @@ void Node::onAckReceived(cMessage *msg)
 
 void Node::handleMessage(cMessage *msg)
 {
-    maybeCrashNow();
+    // the crash event is checked FIRST
+    if (msg->getKind() == CRASH_EVENT) {
+        crashEvent = nullptr;
+        delete msg;
+        crashNow();
+        return;
+    }
+
+    // a crashed node ignores everything else
     if (crashed) {
+        delete msg;
+        return;
+    }
+
+    // NEW: transient fault - a silent node ignores every message (its own timers still run)
+    if (isSilent() && msg->getKind() != RETX_TIMER) {
+        messagesIgnored++;
+        EV_WARN << "Node " << nodeId << ": TRANSIENT fault, ignoring message at t=" << simTime() << "\n";
         delete msg;
         return;
     }
@@ -201,9 +259,20 @@ void Node::finish()
     recordScalar("informed", informed ? 1 : 0);
     recordScalar("messagesSent", messagesSent);
     recordScalar("messagesDropped", messagesDropped);
+    recordScalar("messagesCut", messagesCut);          // NEW
+    recordScalar("messagesIgnored", messagesIgnored);   // NEW
     recordScalar("unreachableNeighbors", (long)unreachableNeighbors.size());
     recordScalar("crashed", crashed ? 1 : 0);
 
     for (auto &kv : retxTimer)
         cancelAndDelete(kv.second);
+    if (crashEvent)                 // crash never happened before the end
+        cancelAndDelete(crashEvent);
+}
+
+// NEW: the node is silent (deaf) between silentStart and silentEnd, then recovers
+bool Node::isSilent()
+{
+    if (silentStart < SIMTIME_ZERO) return false;
+    return simTime() >= silentStart && simTime() < silentEnd;
 }
