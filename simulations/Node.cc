@@ -4,7 +4,7 @@
 
 Define_Module(Node);
 
-// ---- small helpers for serializing the Z set onto a message par ----
+// ---- helpers: turn the set Z into text and back (to put it in a message) ----
 std::string Node::setToStr(const std::set<int> &s)
 {
     std::ostringstream oss;
@@ -47,8 +47,16 @@ void Node::initialize()
 
     buildNeighborTable();
 
+    // NEW: if this node must crash, schedule the crash for crashTime
+    if (crashTime >= SIMTIME_ZERO) {
+        crashEvent = new cMessage("crash", CRASH_EVENT);
+        scheduleAt(crashTime, crashEvent);
+    }
+
     if (isInitiator) {
         informed = true;
+        getDisplayString().setTagArg("i", 1, "green");
+        getDisplayString().setTagArg("i", 2, "60");
         std::set<int> z(neighborIds.begin(), neighborIds.end());
         z.insert(nodeId);
         for (int n : neighborIds)
@@ -57,14 +65,16 @@ void Node::initialize()
     }
 }
 
-void Node::maybeCrashNow()
+// CHANGED: called by the crash event, so it always runs at crashTime
+void Node::crashNow()
 {
-    if (!crashed && crashTime >= SIMTIME_ZERO && simTime() >= crashTime) {
-        crashed = true;
-        EV_INFO << "Node " << nodeId << ": CRASHED at t=" << simTime() << "\n";
-        for (auto &kv : retxTimer)
-            cancelEvent(kv.second);
-    }
+    crashed = true;
+    getDisplayString().setTagArg("i", 1, "red");
+    getDisplayString().setTagArg("i", 2, "80");
+    bubble("CRASHED!");
+    EV_INFO << "Node " << nodeId << ": CRASHED at t=" << simTime() << "\n";
+    for (auto &kv : retxTimer)
+        cancelEvent(kv.second);   // a dead node stops its timers
 }
 
 void Node::sendInformTo(int neighborId, const std::set<int> &z)
@@ -112,6 +122,7 @@ void Node::onRetxTimer(cMessage *msg)
         retry->addPar("zset") = setToStr(pendingZ[neighborId]).c_str();
         if (uniform(0, 1) < msgLossProb) {
             messagesDropped++;
+            EV_WARN << "Node " << nodeId << ": RETRY to " << neighborId << " LOST (simulated).\n";
             delete retry;
         } else {
             send(retry, "out", gateForNeighbor[neighborId]);
@@ -138,6 +149,7 @@ void Node::onInformReceived(cMessage *msg)
             messagesSent++;
         } else {
             messagesDropped++;
+            EV_WARN << "Node " << nodeId << ": ACK to " << senderId << " LOST (simulated).\n";
             delete ack;
         }
     } else {
@@ -146,6 +158,8 @@ void Node::onInformReceived(cMessage *msg)
 
     if (!informed) {
         informed = true;
+        getDisplayString().setTagArg("i", 1, "green");
+        getDisplayString().setTagArg("i", 2, "60");
         EV_INFO << "Node " << nodeId << ": INFORMED (via " << senderId << ")\n";
 
         std::vector<int> y;
@@ -172,7 +186,15 @@ void Node::onAckReceived(cMessage *msg)
 
 void Node::handleMessage(cMessage *msg)
 {
-    maybeCrashNow();
+    // NEW: the crash event is checked FIRST
+    if (msg->getKind() == CRASH_EVENT) {
+        crashEvent = nullptr;
+        delete msg;
+        crashNow();
+        return;
+    }
+
+    // a crashed node ignores everything else
     if (crashed) {
         delete msg;
         return;
@@ -206,4 +228,6 @@ void Node::finish()
 
     for (auto &kv : retxTimer)
         cancelAndDelete(kv.second);
+    if (crashEvent)                 // NEW: crash never happened before the end
+        cancelAndDelete(crashEvent);
 }

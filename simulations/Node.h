@@ -11,7 +11,8 @@ using namespace omnetpp;
 enum MessageKind {
     INFORM = 0,
     ACK = 1,
-    RETX_TIMER = 2
+    RETX_TIMER = 2,
+    CRASH_EVENT = 3     // NEW: tells the node "you crash now"
 };
 
 class Node : public cSimpleModule
@@ -25,6 +26,7 @@ class Node : public cSimpleModule
     simtime_t crashTime;
     bool crashed = false;
     bool informed = false;
+    cMessage *crashEvent = nullptr;   // NEW: the scheduled crash
 
     std::vector<int> neighborIds;
     std::map<int, int> gateForNeighbor;
@@ -43,7 +45,7 @@ class Node : public cSimpleModule
     virtual void handleMessage(cMessage *msg) override;
     virtual void finish() override;
 
-    void maybeCrashNow();
+    void crashNow();                  // CHANGED: was maybeCrashNow()
     void buildNeighborTable();
     void sendInformTo(int neighborId, const std::set<int> &z);
     void onInformReceived(cMessage *msg);
