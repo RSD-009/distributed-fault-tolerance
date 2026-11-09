@@ -14,6 +14,12 @@ simple Node
         int maxRetries = default(3);
         double msgLossProb = default(0);  // probability a given send is dropped
         double crashTime @unit(s) = default(-1s); // -1 = never crash
+
+        // NEW: network partition = one link is cut during a time window
+        int partitionPeer = default(-1);               // neighbour at the other end of the cut link (-1 = none)
+        double partitionStart @unit(s) = default(-1s); // when the cut starts
+        double partitionEnd @unit(s) = default(-1s);   // when the link works again
+
         @display("i=device/server");
     gates:
         input in[];

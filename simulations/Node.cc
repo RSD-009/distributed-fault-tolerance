@@ -45,9 +45,14 @@ void Node::initialize()
     msgLossProb = par("msgLossProb");
     crashTime = par("crashTime");
 
+    // NEW: read the partition settings
+    partitionPeer = par("partitionPeer");
+    partitionStart = par("partitionStart");
+    partitionEnd = par("partitionEnd");
+
     buildNeighborTable();
 
-    // NEW: if this node must crash, schedule the crash for crashTime
+    // if this node must crash, schedule the crash for crashTime
     if (crashTime >= SIMTIME_ZERO) {
         crashEvent = new cMessage("crash", CRASH_EVENT);
         scheduleAt(crashTime, crashEvent);
@@ -65,7 +70,7 @@ void Node::initialize()
     }
 }
 
-// CHANGED: called by the crash event, so it always runs at crashTime
+// called by the crash event, so it always runs at crashTime
 void Node::crashNow()
 {
     crashed = true;
@@ -77,6 +82,15 @@ void Node::crashNow()
         cancelEvent(kv.second);   // a dead node stops its timers
 }
 
+// NEW: the link to 'neighborId' is cut if it is the partition peer
+// AND the current time is inside [partitionStart, partitionEnd)
+bool Node::linkIsCut(int neighborId)
+{
+    if (neighborId != partitionPeer) return false;
+    if (partitionStart < SIMTIME_ZERO) return false;
+    return simTime() >= partitionStart && simTime() < partitionEnd;
+}
+
 void Node::sendInformTo(int neighborId, const std::set<int> &z)
 {
     pendingZ[neighborId] = z;
@@ -86,7 +100,11 @@ void Node::sendInformTo(int neighborId, const std::set<int> &z)
     msg->addPar("senderId") = nodeId;
     msg->addPar("zset") = setToStr(z).c_str();
 
-    if (uniform(0, 1) < msgLossProb) {
+    if (linkIsCut(neighborId)) {                       // NEW
+        messagesCut++;
+        EV_WARN << "Node " << nodeId << ": PARTITION blocks message to " << neighborId << ".\n";
+        delete msg;
+    } else if (uniform(0, 1) < msgLossProb) {
         messagesDropped++;
         EV_WARN << "Node " << nodeId << ": message to " << neighborId << " LOST (simulated).\n";
         delete msg;
@@ -120,7 +138,11 @@ void Node::onRetxTimer(cMessage *msg)
         cMessage *retry = new cMessage("INFORM", INFORM);
         retry->addPar("senderId") = nodeId;
         retry->addPar("zset") = setToStr(pendingZ[neighborId]).c_str();
-        if (uniform(0, 1) < msgLossProb) {
+        if (linkIsCut(neighborId)) {                   // NEW
+            messagesCut++;
+            EV_WARN << "Node " << nodeId << ": PARTITION blocks retry to " << neighborId << ".\n";
+            delete retry;
+        } else if (uniform(0, 1) < msgLossProb) {
             messagesDropped++;
             EV_WARN << "Node " << nodeId << ": RETRY to " << neighborId << " LOST (simulated).\n";
             delete retry;
@@ -144,7 +166,11 @@ void Node::onInformReceived(cMessage *msg)
     cMessage *ack = new cMessage("ACK", ACK);
     ack->addPar("senderId") = nodeId;
     if (gateForNeighbor.count(senderId)) {
-        if (uniform(0, 1) >= msgLossProb) {
+        if (linkIsCut(senderId)) {                     // NEW
+            messagesCut++;
+            EV_WARN << "Node " << nodeId << ": PARTITION blocks ACK to " << senderId << ".\n";
+            delete ack;
+        } else if (uniform(0, 1) >= msgLossProb) {
             send(ack, "out", gateForNeighbor[senderId]);
             messagesSent++;
         } else {
@@ -186,7 +212,7 @@ void Node::onAckReceived(cMessage *msg)
 
 void Node::handleMessage(cMessage *msg)
 {
-    // NEW: the crash event is checked FIRST
+    // the crash event is checked FIRST
     if (msg->getKind() == CRASH_EVENT) {
         crashEvent = nullptr;
         delete msg;
@@ -223,11 +249,12 @@ void Node::finish()
     recordScalar("informed", informed ? 1 : 0);
     recordScalar("messagesSent", messagesSent);
     recordScalar("messagesDropped", messagesDropped);
+    recordScalar("messagesCut", messagesCut);          // NEW
     recordScalar("unreachableNeighbors", (long)unreachableNeighbors.size());
     recordScalar("crashed", crashed ? 1 : 0);
 
     for (auto &kv : retxTimer)
         cancelAndDelete(kv.second);
-    if (crashEvent)                 // NEW: crash never happened before the end
+    if (crashEvent)                 // crash never happened before the end
         cancelAndDelete(crashEvent);
 }

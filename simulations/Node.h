@@ -12,7 +12,7 @@ enum MessageKind {
     INFORM = 0,
     ACK = 1,
     RETX_TIMER = 2,
-    CRASH_EVENT = 3     // NEW: tells the node "you crash now"
+    CRASH_EVENT = 3     // tells the node "you crash now"
 };
 
 class Node : public cSimpleModule
@@ -26,7 +26,12 @@ class Node : public cSimpleModule
     simtime_t crashTime;
     bool crashed = false;
     bool informed = false;
-    cMessage *crashEvent = nullptr;   // NEW: the scheduled crash
+    cMessage *crashEvent = nullptr;   // the scheduled crash
+
+    // NEW: partition settings (one cut link, one time window)
+    int partitionPeer;
+    simtime_t partitionStart;
+    simtime_t partitionEnd;
 
     std::vector<int> neighborIds;
     std::map<int, int> gateForNeighbor;
@@ -39,13 +44,15 @@ class Node : public cSimpleModule
 
     long messagesSent = 0;
     long messagesDropped = 0;
+    long messagesCut = 0;             // NEW: messages blocked by the partition
 
   protected:
     virtual void initialize() override;
     virtual void handleMessage(cMessage *msg) override;
     virtual void finish() override;
 
-    void crashNow();                  // CHANGED: was maybeCrashNow()
+    void crashNow();
+    bool linkIsCut(int neighborId);   // NEW: is the link to this neighbour cut right now?
     void buildNeighborTable();
     void sendInformTo(int neighborId, const std::set<int> &z);
     void onInformReceived(cMessage *msg);
