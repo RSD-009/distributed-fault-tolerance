@@ -33,6 +33,10 @@ class Node : public cSimpleModule
     simtime_t partitionStart;
     simtime_t partitionEnd;
 
+    // NEW: transient fault window
+    simtime_t silentStart;
+    simtime_t silentEnd;
+
     std::vector<int> neighborIds;
     std::map<int, int> gateForNeighbor;
 
@@ -45,6 +49,7 @@ class Node : public cSimpleModule
     long messagesSent = 0;
     long messagesDropped = 0;
     long messagesCut = 0;             // NEW: messages blocked by the partition
+    long messagesIgnored = 0;         // NEW: messages ignored while silent
 
   protected:
     virtual void initialize() override;
@@ -53,6 +58,7 @@ class Node : public cSimpleModule
 
     void crashNow();
     bool linkIsCut(int neighborId);   // NEW: is the link to this neighbour cut right now?
+    bool isSilent();                  // NEW: is this node deaf right now?
     void buildNeighborTable();
     void sendInformTo(int neighborId, const std::set<int> &z);
     void onInformReceived(cMessage *msg);

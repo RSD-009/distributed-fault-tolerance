@@ -20,6 +20,10 @@ simple Node
         double partitionStart @unit(s) = default(-1s); // when the cut starts
         double partitionEnd @unit(s) = default(-1s);   // when the link works again
 
+        // NEW: transient fault = node is deaf during a window, then recovers
+        double silentStart @unit(s) = default(-1s);
+        double silentEnd @unit(s) = default(-1s);
+
         @display("i=device/server");
     gates:
         input in[];

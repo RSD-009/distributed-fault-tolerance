@@ -49,6 +49,8 @@ void Node::initialize()
     partitionPeer = par("partitionPeer");
     partitionStart = par("partitionStart");
     partitionEnd = par("partitionEnd");
+    silentStart = par("silentStart");
+    silentEnd = par("silentEnd");
 
     buildNeighborTable();
 
@@ -226,6 +228,14 @@ void Node::handleMessage(cMessage *msg)
         return;
     }
 
+    // NEW: transient fault - a silent node ignores every message (its own timers still run)
+    if (isSilent() && msg->getKind() != RETX_TIMER) {
+        messagesIgnored++;
+        EV_WARN << "Node " << nodeId << ": TRANSIENT fault, ignoring message at t=" << simTime() << "\n";
+        delete msg;
+        return;
+    }
+
     switch (msg->getKind()) {
         case INFORM:
             onInformReceived(msg);
@@ -250,6 +260,7 @@ void Node::finish()
     recordScalar("messagesSent", messagesSent);
     recordScalar("messagesDropped", messagesDropped);
     recordScalar("messagesCut", messagesCut);          // NEW
+    recordScalar("messagesIgnored", messagesIgnored);   // NEW
     recordScalar("unreachableNeighbors", (long)unreachableNeighbors.size());
     recordScalar("crashed", crashed ? 1 : 0);
 
@@ -257,4 +268,11 @@ void Node::finish()
         cancelAndDelete(kv.second);
     if (crashEvent)                 // crash never happened before the end
         cancelAndDelete(crashEvent);
+}
+
+// NEW: the node is silent (deaf) between silentStart and silentEnd, then recovers
+bool Node::isSilent()
+{
+    if (silentStart < SIMTIME_ZERO) return false;
+    return simTime() >= silentStart && simTime() < silentEnd;
 }
