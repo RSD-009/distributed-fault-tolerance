@@ -14,19 +14,34 @@ reliability; this project removes that assumption.
 Requires OMNeT++ 6.4.0. Import the repo in the OMNeT++ IDE (File > New >
 OMNeT++ Project, default location), then press Ctrl+B to build.
 
-## Scenarios (all in simulations/omnetpp.ini)
-| Config | Fault | Expected result |
-|---|---|---|
-| Baseline | none | 7/7 informed, 12 messages (6 INFORM + 6 ACK) |
-| Crash | relay node 1 crashes at 2ms (permanent) | 4/7 informed, node 0 reports node 1 UNREACHABLE |
-| MsgLoss | each message lost with probability 0.3 | normally 7/7, extra retransmissions |
-| CrashAndLoss | crash + 20% loss | at most 4/7 |
-| Partition | link 1-3 cut from 4ms to 70ms, then heals | 7/7, node 3 informed late |
-| PartitionLong | link 1-3 cut for 500ms | 6/7, node 1 wrongly suspects node 3 |
-| Transient | node 1 deaf from 4ms to 70ms, then recovers | 7/7, node 1 informed at about 105ms |
+## Faults and mechanisms
+Faults (what goes wrong):
+- **Node faults:** permanent crash, crash + reboot, transient (deaf for a while).
+- **Link faults:** message loss, partition (short or long).
 
-Each config has 10 runs (`repeat = 10`), each with a different random seed.
-Only MsgLoss and CrashAndLoss are random; the other configs give identical runs.
+Mechanisms (the answer to a fault), each one a switch in omnetpp.ini:
+- **Timeout + retransmission** (`maxRetries`, 0 = detection only): loss, short partition, transient.
+- **Checkpointing** (`checkpointing`): crash + reboot.
+- **Replication** (`replication`, backup links 2-3 and 2-4): permanent crash, long partition.
+
+## Experiments (simulations/omnetpp.ini, named Family_Fault_Mechanism)
+| Config | Fault | Mechanism | Informed |
+|---|---|---|---|
+| Baseline | none | none | 7/7 (12 messages) |
+| Node_Crash_Timeout | node 1 crashes at 2ms | detection only | 4/7 |
+| Node_Crash_Replication | same | backup links | 6/7 |
+| Node_Reboot_Cold | node 1 crashes at 7ms, reboots at 100ms | none | 6/7 |
+| Node_Reboot_Checkpoint | same | checkpointing | 7/7 |
+| Node_Transient_NoRetry | node 1 deaf 4-70ms | none | 4/7 |
+| Node_Transient_Retransmit | same | retransmission | 7/7 |
+| Link_Loss_NoRetry | 30% loss | none | below 7/7 |
+| Link_Loss_Retransmit | same | retransmission | about 7/7 |
+| Link_Partition_NoRetry | link 1-3 cut 4-70ms | none | 6/7 |
+| Link_Partition_Retransmit | same | retransmission | 7/7 |
+| Link_PartitionLong_Retransmit | link 1-3 cut 500ms | retransmission | 6/7 (false suspicion) |
+| Link_PartitionLong_Replication | same | backup links | 7/7 |
+
+Each config has 10 runs (`repeat = 10`). Only the Link_Loss configs are random.
 
 ## Run from the terminal
     cd simulations
