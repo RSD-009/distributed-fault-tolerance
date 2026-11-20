@@ -12,7 +12,8 @@ enum MessageKind {
     INFORM = 0,
     ACK = 1,
     RETX_TIMER = 2,
-    CRASH_EVENT = 3     // tells the node "you crash now"
+    CRASH_EVENT = 3,
+    RECOVER_EVENT = 4
 };
 
 class Node : public cSimpleModule
@@ -20,20 +21,24 @@ class Node : public cSimpleModule
   private:
     int nodeId;
     bool isInitiator;
+    bool isCrashTarget;
     simtime_t timeoutValue;
     int maxRetries;
     double msgLossProb;
     simtime_t crashTime;
     bool crashed = false;
     bool informed = false;
-    cMessage *crashEvent = nullptr;   // the scheduled crash
+    double informedAt = -1;
+    cMessage *crashEvent = nullptr;
 
-    // NEW: partition settings (one cut link, one time window)
+    simtime_t recoverTime;
+    bool checkpointing;
+    cMessage *recoverEvent = nullptr;
+
     int partitionPeer;
     simtime_t partitionStart;
     simtime_t partitionEnd;
 
-    // NEW: transient fault window
     simtime_t silentStart;
     simtime_t silentEnd;
 
@@ -46,10 +51,16 @@ class Node : public cSimpleModule
     std::set<int> ackedNeighbors;
     std::set<int> unreachableNeighbors;
 
+    bool ckInformed = false;
+    std::map<int, std::set<int>> ckPendingZ;
+    std::set<int> ckAcked;
+    std::set<int> ckUnreachable;
+    long checkpointsSaved = 0;
+
     long messagesSent = 0;
     long messagesDropped = 0;
-    long messagesCut = 0;             // NEW: messages blocked by the partition
-    long messagesIgnored = 0;         // NEW: messages ignored while silent
+    long messagesCut = 0;
+    long messagesIgnored = 0;
 
   protected:
     virtual void initialize() override;
@@ -57,8 +68,10 @@ class Node : public cSimpleModule
     virtual void finish() override;
 
     void crashNow();
-    bool linkIsCut(int neighborId);   // NEW: is the link to this neighbour cut right now?
-    bool isSilent();                  // NEW: is this node deaf right now?
+    void recoverNow();
+    void saveCheckpoint();
+    bool linkIsCut(int neighborId);
+    bool isSilent();
     void buildNeighborTable();
     void sendInformTo(int neighborId, const std::set<int> &z);
     void onInformReceived(cMessage *msg);
