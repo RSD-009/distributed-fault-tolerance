@@ -7,7 +7,7 @@ network Network
         bool replication = default(false);
         int initiatorId = default(intuniform(0, numNodes-1));
         int crashNodeId = default(intuniform(0, numNodes-1));
-        int partitionNodeId = default(intuniform(1, numNodes-1));
+        int partitionNodeId = default(3 + intuniform(0, 1)); // randomly node 3 or 4 -- the only two with a backup path
         int partitionParentId = default(int(floor((partitionNodeId-1)/2.0)));
     submodules:
         node[numNodes]: Node {
@@ -16,6 +16,7 @@ network Network
             isCrashTarget = (index == parent.crashNodeId);
             partitionPeer = (index == parent.partitionNodeId) ? parent.partitionParentId
                           : (index == parent.partitionParentId) ? parent.partitionNodeId : -1;
+            @display("p=,,ring");
         }
     connections allowunconnected:
         for i=0..numNodes-1 {
