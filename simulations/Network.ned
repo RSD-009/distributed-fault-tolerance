@@ -1,26 +1,22 @@
 package simulations;
 
-//
-// A binary-tree topology of N nodes (node 0 = root = diffuse-v3 initiator).
-// Chosen over a full mesh deliberately: in a full mesh every node is directly
-// reachable from the initiator in one hop, which makes diffuse-v3's whole
-// point (avoiding redundant relays via the Z set) invisible. A tree forces
-// real multi-hop relaying, and makes a crashed relay's impact obvious: its
-// entire subtree becomes unreachable -- exactly what the "availability"
-// metric in the project brief is meant to capture.
-//
-// Student A: for a denser/more redundant topology (so a single crash can't
-// strand a subtree), add extra cross-links here -- the Node.cc logic doesn't
-// care about topology shape, it reads N(x) straight from the wiring.
-//
 network Network
 {
     parameters:
-        int numNodes = default(7); // keep between 5 and 10 per the project spec
+        int numNodes = default(7);
+        bool replication = default(false);
+        int initiatorId = default(intuniform(0, numNodes-1));
+        int crashNodeId = default(intuniform(0, numNodes-1));
+        int partitionNodeId = default(3 + intuniform(0, 1)); // randomly node 3 or 4 -- the only two with a backup path
+        int partitionParentId = default(int(floor((partitionNodeId-1)/2.0)));
     submodules:
         node[numNodes]: Node {
             nodeId = index;
-            isInitiator = (index == 0);
+            isInitiator = (index == parent.initiatorId);
+            isCrashTarget = (index == parent.crashNodeId);
+            partitionPeer = (index == parent.partitionNodeId) ? parent.partitionParentId
+                          : (index == parent.partitionParentId) ? parent.partitionNodeId : -1;
+            @display("p=,,ring");
         }
     connections allowunconnected:
         for i=0..numNodes-1 {
@@ -29,4 +25,8 @@ network Network
             node[i].out++ --> {delay = 5ms;} --> node[2*i+2].in++ if 2*i+2 < numNodes;
             node[2*i+2].out++ --> {delay = 5ms;} --> node[i].in++ if 2*i+2 < numNodes;
         }
+        node[2].out++ --> {delay = 5ms;} --> node[3].in++ if replication && numNodes > 4;
+        node[3].out++ --> {delay = 5ms;} --> node[2].in++ if replication && numNodes > 4;
+        node[2].out++ --> {delay = 5ms;} --> node[4].in++ if replication && numNodes > 4;
+        node[4].out++ --> {delay = 5ms;} --> node[2].in++ if replication && numNodes > 4;
 }
