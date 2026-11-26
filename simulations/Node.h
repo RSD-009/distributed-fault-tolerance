@@ -13,8 +13,8 @@ enum MessageKind {
     INFORM = 0,          // a DiffuseMessage (diffuse-v3)
     ACK = 1,             // added by us (fault tolerance)
     RETX_TIMER = 2,      // added by us (fault tolerance)
-    CRASH_EVENT = 3,
-    RECOVER_EVENT = 4
+    CRASH_TIMER = 3,
+    RECOVER_TIMER = 4
 };
 
 class Node : public cSimpleModule
@@ -29,11 +29,11 @@ class Node : public cSimpleModule
     simtime_t crashTime;
     bool crashed = false;
     double informedAt = -1;
-    cMessage *crashEvent = nullptr;
+    cMessage *crashTimer = nullptr;
 
     simtime_t recoverTime;
     bool checkpointing;
-    cMessage *recoverEvent = nullptr;
+    cMessage *recoverTimer = nullptr;
 
     int partitionPeer;
     simtime_t partitionStart;
