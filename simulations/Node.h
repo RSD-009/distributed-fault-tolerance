@@ -5,13 +5,14 @@
 #include <map>
 #include <set>
 #include <vector>
+#include "DiffuseMessage_m.h"      // generated from DiffuseMessage.msg
 
 using namespace omnetpp;
 
 enum MessageKind {
-    INFORM = 0,
-    ACK = 1,
-    RETX_TIMER = 2,
+    INFORM = 0,          // a DiffuseMessage (diffuse-v3)
+    ACK = 1,             // added by us (fault tolerance)
+    RETX_TIMER = 2,      // added by us (fault tolerance)
     CRASH_EVENT = 3,
     RECOVER_EVENT = 4
 };
@@ -27,7 +28,6 @@ class Node : public cSimpleModule
     double msgLossProb;
     simtime_t crashTime;
     bool crashed = false;
-    bool informed = false;
     double informedAt = -1;
     cMessage *crashEvent = nullptr;
 
@@ -42,16 +42,21 @@ class Node : public cSimpleModule
     simtime_t silentStart;
     simtime_t silentEnd;
 
-    std::vector<int> neighborIds;
+    // ---- diffuse-v3 (course Chapter 2) ----
+    bool done = false;                 // course state "done" (was: informed)
+    int information = 0;               // I, the information received
+    std::vector<int> N;                // N(x): the neighbours of this node
     std::map<int, int> gateForNeighbor;
 
+    // ---- fault tolerance (ours, unchanged) ----
     std::map<int, std::set<int>> pendingZ;
     std::map<int, int> retriesSoFar;
     std::map<int, cMessage *> retxTimer;
     std::set<int> ackedNeighbors;
     std::set<int> unreachableNeighbors;
 
-    bool ckInformed = false;
+    bool ckDone = false;
+    int ckInformation = 0;
     std::map<int, std::set<int>> ckPendingZ;
     std::set<int> ckAcked;
     std::set<int> ckUnreachable;
@@ -67,6 +72,12 @@ class Node : public cSimpleModule
     virtual void handleMessage(cMessage *msg) override;
     virtual void finish() override;
 
+    // diffuse-v3
+    void onInformReceived(DiffuseMessage *msg);
+    DiffuseMessage *makeDiffuse(const std::set<int> &z);
+    std::set<int> zOf(DiffuseMessage *msg);
+
+    // fault tolerance
     void crashNow();
     void recoverNow();
     void saveCheckpoint();
@@ -74,12 +85,9 @@ class Node : public cSimpleModule
     bool isSilent();
     void buildNeighborTable();
     void sendInformTo(int neighborId, const std::set<int> &z);
-    void onInformReceived(cMessage *msg);
+    void sendAck(int senderId);
     void onAckReceived(cMessage *msg);
     void onRetxTimer(cMessage *msg);
-
-    static std::string setToStr(const std::set<int> &s);
-    static std::set<int> strToSet(const std::string &s);
 };
 
 #endif

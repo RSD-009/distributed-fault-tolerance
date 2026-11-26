@@ -1,38 +1,53 @@
 #include "Node.h"
-#include <sstream>
 #include <algorithm>
 
 Define_Module(Node);
 
-std::string Node::setToStr(const std::set<int> &s)
-{
-    std::ostringstream oss;
-    for (auto it = s.begin(); it != s.end(); ++it) {
-        if (it != s.begin()) oss << ",";
-        oss << *it;
-    }
-    return oss.str();
-}
+static const int INFORMATION = 2026;   // the information I broadcast by the initiator
 
-std::set<int> Node::strToSet(const std::string &s)
-{
-    std::set<int> result;
-    std::stringstream ss(s);
-    std::string item;
-    while (std::getline(ss, item, ',')) {
-        if (!item.empty()) result.insert(std::stoi(item));
-    }
-    return result;
-}
+// =====================================================================
+//  PART 1 - diffuse-v3 (course Chapter 2, same rules as the lab Node3)
+//  States: initiator / idle / done        Events: SP, Receiving(I,Z)
+//   1) initiator x SP           -> send(I, N(x)+x) to N(x); become done
+//   2) idle x Receiving(I,Z)    -> Process(I); become done;
+//                                  if Y = N(x)\Z is not empty: send(I, Y U Z + x) to Y
+//   3) initiator x Receiving    -> nil
+//   4) idle x SP                -> nil
+//   5) done x Receiving         -> nil
+//   6) done x SP                -> nil
+// =====================================================================
 
 void Node::buildNeighborTable()
 {
+    // N(x): read off the wiring, so it works on any topology
     for (int i = 0; i < gateSize("out"); i++) {
         cGate *remote = gate("out", i)->getNextGate();
         int neighborId = remote->getOwnerModule()->par("nodeId");
-        neighborIds.push_back(neighborId);
+        N.push_back(neighborId);
         gateForNeighbor[neighborId] = i;
     }
+}
+
+// build a diffuse-v3 message (I, Z) from a set Z
+DiffuseMessage *Node::makeDiffuse(const std::set<int> &z)
+{
+    DiffuseMessage *msg = new DiffuseMessage("diffusion v3", INFORM);
+    msg->setInformation(information);
+    msg->setZArraySize(z.size());
+    size_t k = 0;
+    for (int v : z)
+        msg->setZ(k++, v);
+    msg->addPar("senderId") = nodeId;   // only used by the ACK layer (ours)
+    return msg;
+}
+
+// read the content of Z from a message
+std::set<int> Node::zOf(DiffuseMessage *msg)
+{
+    std::set<int> z;
+    for (size_t j = 0; j < msg->getZArraySize(); j++)
+        z.insert(msg->getZ(j));
+    return z;
 }
 
 void Node::initialize()
@@ -67,23 +82,100 @@ void Node::initialize()
     }
 
     if (isInitiator) {
-        informed = true;
+        // rule 1: initiator x SP -> send(I, N(x)+x) to N(x); become done
+        information = INFORMATION;
+        DiffuseMessage *msg = new DiffuseMessage("diffusion v3", INFORM);
+        msg->setInformation(information);
+        msg->setZArraySize(N.size());
+        for (size_t i = 0; i < N.size(); i++)
+            msg->setZ(i, N[i]);              // Z = N(x)
+        msg->appendZ(nodeId);                // ... + x
+        std::set<int> z = zOf(msg);
+        delete msg;
+
+        done = true;
         informedAt = simTime().dbl();
         getDisplayString().setTagArg("i", 1, "green");
         getDisplayString().setTagArg("i", 2, "60");
-        std::set<int> z(neighborIds.begin(), neighborIds.end());
-        z.insert(nodeId);
-        for (int n : neighborIds)
+        EV_INFO << "Node " << nodeId << ": [rule 1] initiator x SP -> send(I, N(x)+x) to N(x); become done\n";
+        for (int n : N)
             sendInformTo(n, z);
         saveCheckpoint();
         EV_INFO << "Node " << nodeId << ": INITIATOR, diffusion started.\n";
     }
 }
 
+void Node::onInformReceived(DiffuseMessage *msg)
+{
+    int senderId = (int)msg->par("senderId").longValue();
+
+    // fault tolerance (ours): always ACK, even for a message already seen
+    sendAck(senderId);
+
+    // rules 3 and 5: initiator / done x Receiving(I,Z) -> nil
+    if (done) {
+        EV_DEBUG << "Node " << nodeId << ": [rule 3/5] done x Receiving(I,Z) -> nil\n";
+        return;
+    }
+
+    // rule 2: idle x Receiving(I,Z) -> Process(I); become done; send(I, Y U Z + x) to Y
+    done = true;
+    informedAt = simTime().dbl();
+    getDisplayString().setTagArg("i", 1, "green");
+    getDisplayString().setTagArg("i", 2, "60");
+    EV_INFO << "Node " << nodeId << ": [rule 2] idle x Receiving(I,Z) -> become done\n";
+    EV_INFO << "Node " << nodeId << ": INFORMED (via " << senderId << ")\n";
+
+    information = msg->getInformation();      // Process(I)
+
+    // Y = N(x) \ Z : the neighbours that are not in Z
+    std::vector<int> Y;
+    for (size_t i = 0; i < N.size(); i++) {
+        bool existe = false;
+        for (size_t j = 0; j < msg->getZArraySize() && !existe; j++) {
+            if (msg->getZ(j) == N[i])
+                existe = true;
+        }
+        if (!existe)
+            Y.push_back(N[i]);
+    }
+
+    // Z + Y
+    for (size_t k = 0; k < Y.size(); k++)
+        msg->appendZ(Y[k]);
+
+    // + x
+    bool xExiste = false;
+    for (size_t j = 0; j < msg->getZArraySize(); j++) {
+        if (msg->getZ(j) == nodeId) {
+            xExiste = true;
+            break;
+        }
+    }
+    if (!xExiste)
+        msg->appendZ(nodeId);
+
+    // send(I, Y U Z + x) to Y
+    if (!Y.empty()) {
+        std::set<int> newZ = zOf(msg);
+        for (size_t k = 0; k < Y.size(); k++)
+            sendInformTo(Y[k], newZ);
+    }
+    saveCheckpoint();
+}
+
+// =====================================================================
+//  PART 2 - FAULT TOLERANCE (added by us, not in the course)
+//  ACK + timeout retransmission, crash, reboot, checkpoint,
+//  link down (partition), transient fault, message loss.
+//  Nothing below depends on how the diffuse rules are written.
+// =====================================================================
+
 void Node::saveCheckpoint()
 {
     if (!checkpointing) return;
-    ckInformed = informed;
+    ckDone = done;
+    ckInformation = information;
     ckPendingZ = pendingZ;
     ckAcked = ackedNeighbors;
     ckUnreachable = unreachableNeighbors;
@@ -108,12 +200,13 @@ void Node::recoverNow()
     EV_INFO << "Node " << nodeId << ": RECOVERED at t=" << simTime() << "\n";
 
     if (checkpointing) {
-        informed = ckInformed;
+        done = ckDone;
+        information = ckInformation;
         pendingZ = ckPendingZ;
         ackedNeighbors = ckAcked;
         unreachableNeighbors = ckUnreachable;
         EV_INFO << "Node " << nodeId << ": state RESTORED from checkpoint (informed="
-                << informed << ")\n";
+                << done << ")\n";
 
         std::map<int, std::set<int>> toResend = pendingZ;
         for (auto &kv : toResend) {
@@ -124,7 +217,8 @@ void Node::recoverNow()
             }
         }
     } else {
-        informed = false;
+        done = false;
+        information = 0;
         informedAt = -1;
         pendingZ.clear();
         retriesSoFar.clear();
@@ -136,7 +230,7 @@ void Node::recoverNow()
         EV_INFO << "Node " << nodeId << ": cold restart, memory LOST (informed=false)\n";
     }
 
-    getDisplayString().setTagArg("i", 1, informed ? "green" : "gold");
+    getDisplayString().setTagArg("i", 1, done ? "green" : "gold");
     getDisplayString().setTagArg("i", 2, "60");
 }
 
@@ -158,9 +252,7 @@ void Node::sendInformTo(int neighborId, const std::set<int> &z)
     pendingZ[neighborId] = z;
     retriesSoFar[neighborId] = 0;
 
-    cMessage *msg = new cMessage("INFORM", INFORM);
-    msg->addPar("senderId") = nodeId;
-    msg->addPar("zset") = setToStr(z).c_str();
+    DiffuseMessage *msg = makeDiffuse(z);
 
     if (linkIsCut(neighborId)) {
         messagesCut++;
@@ -187,44 +279,8 @@ void Node::sendInformTo(int neighborId, const std::set<int> &z)
     scheduleAt(simTime() + timeoutValue, timer);
 }
 
-void Node::onRetxTimer(cMessage *msg)
+void Node::sendAck(int senderId)
 {
-    int neighborId = (int)msg->par("neighborId").longValue();
-    if (ackedNeighbors.count(neighborId)) return;
-
-    if (retriesSoFar[neighborId] < maxRetries) {
-        retriesSoFar[neighborId]++;
-        EV_INFO << "Node " << nodeId << ": no ACK from " << neighborId
-                << ", RETRANSMIT (" << retriesSoFar[neighborId] << "/" << maxRetries << ")\n";
-        cMessage *retry = new cMessage("INFORM", INFORM);
-        retry->addPar("senderId") = nodeId;
-        retry->addPar("zset") = setToStr(pendingZ[neighborId]).c_str();
-        if (linkIsCut(neighborId)) {
-            messagesCut++;
-            EV_WARN << "Node " << nodeId << ": PARTITION blocks retry to " << neighborId << ".\n";
-            delete retry;
-        } else if (uniform(0, 1) < msgLossProb) {
-            messagesDropped++;
-            EV_WARN << "Node " << nodeId << ": RETRY to " << neighborId << " LOST (simulated).\n";
-            delete retry;
-        } else {
-            send(retry, "out", gateForNeighbor[neighborId]);
-            messagesSent++;
-        }
-        scheduleAt(simTime() + timeoutValue, msg);
-    } else {
-        unreachableNeighbors.insert(neighborId);
-        saveCheckpoint();
-        EV_WARN << "Node " << nodeId << ": neighbour " << neighborId
-                << " UNREACHABLE after " << maxRetries << " retries -- presumed crashed.\n";
-    }
-}
-
-void Node::onInformReceived(cMessage *msg)
-{
-    int senderId = (int)msg->par("senderId").longValue();
-    std::set<int> z = strToSet(msg->par("zset").stringValue());
-
     cMessage *ack = new cMessage("ACK", ACK);
     ack->addPar("senderId") = nodeId;
     if (gateForNeighbor.count(senderId)) {
@@ -243,26 +299,36 @@ void Node::onInformReceived(cMessage *msg)
     } else {
         delete ack;
     }
+}
 
-    if (!informed) {
-        informed = true;
-        informedAt = simTime().dbl();
-        getDisplayString().setTagArg("i", 1, "green");
-        getDisplayString().setTagArg("i", 2, "60");
-        EV_INFO << "Node " << nodeId << ": INFORMED (via " << senderId << ")\n";
+void Node::onRetxTimer(cMessage *msg)
+{
+    int neighborId = (int)msg->par("neighborId").longValue();
+    if (ackedNeighbors.count(neighborId)) return;
 
-        std::vector<int> y;
-        for (int n : neighborIds)
-            if (!z.count(n)) y.push_back(n);
-
-        if (!y.empty()) {
-            std::set<int> newZ = z;
-            for (int n : y) newZ.insert(n);
-            newZ.insert(nodeId);
-            for (int n : y)
-                sendInformTo(n, newZ);
+    if (retriesSoFar[neighborId] < maxRetries) {
+        retriesSoFar[neighborId]++;
+        EV_INFO << "Node " << nodeId << ": no ACK from " << neighborId
+                << ", RETRANSMIT (" << retriesSoFar[neighborId] << "/" << maxRetries << ")\n";
+        DiffuseMessage *retry = makeDiffuse(pendingZ[neighborId]);
+        if (linkIsCut(neighborId)) {
+            messagesCut++;
+            EV_WARN << "Node " << nodeId << ": PARTITION blocks retry to " << neighborId << ".\n";
+            delete retry;
+        } else if (uniform(0, 1) < msgLossProb) {
+            messagesDropped++;
+            EV_WARN << "Node " << nodeId << ": RETRY to " << neighborId << " LOST (simulated).\n";
+            delete retry;
+        } else {
+            send(retry, "out", gateForNeighbor[neighborId]);
+            messagesSent++;
         }
+        scheduleAt(simTime() + timeoutValue, msg);
+    } else {
+        unreachableNeighbors.insert(neighborId);
         saveCheckpoint();
+        EV_WARN << "Node " << nodeId << ": neighbour " << neighborId
+                << " UNREACHABLE after " << maxRetries << " retries -- presumed crashed.\n";
     }
 }
 
@@ -302,7 +368,7 @@ void Node::handleMessage(cMessage *msg)
 
     switch (msg->getKind()) {
         case INFORM:
-            onInformReceived(msg);
+            onInformReceived(check_and_cast<DiffuseMessage *>(msg));
             delete msg;
             break;
         case ACK:
@@ -320,7 +386,7 @@ void Node::handleMessage(cMessage *msg)
 
 void Node::finish()
 {
-    recordScalar("informed", informed ? 1 : 0);
+    recordScalar("informed", done ? 1 : 0);
     recordScalar("informedAt", informedAt);
     recordScalar("messagesSent", messagesSent);
     recordScalar("messagesDropped", messagesDropped);
