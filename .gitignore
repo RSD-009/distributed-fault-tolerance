@@ -8,3 +8,5 @@ Makefile
 dft
 /distributed-fault-tolerance
 /distributed-fault-tolerance_dbg
+*_m.cc
+*_m.h
