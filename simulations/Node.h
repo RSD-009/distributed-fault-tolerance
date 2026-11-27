@@ -33,6 +33,7 @@ class Node : public cSimpleModule
 
     simtime_t recoverTime;
     bool checkpointing;
+    bool useZ = true;
     cMessage *recoverTimer = nullptr;
 
     int partitionPeer;
