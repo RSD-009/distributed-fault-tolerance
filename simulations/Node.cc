@@ -244,7 +244,6 @@ bool Node::linkIsCut(int neighborId)
 bool Node::isSilent()
 {
     if (!isCrashTarget) return false;   // only the random victim of the run goes deaf
-    if (!isCrashTarget) return false;   // only the random victim of the run goes deaf
     if (silentStart < SIMTIME_ZERO) return false;
     return simTime() >= silentStart && simTime() < silentEnd;
 }
