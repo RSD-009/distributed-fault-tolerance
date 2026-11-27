@@ -1,0 +1,15 @@
+metric,n,mean_delta,sd,ic95,wins,ties,losses,pairing_ok,titre,sans,avec
+availability,10,5.71,7.38,5.28,4,6,0,True,Reboot : Cold -> Checkpoint,Node_Reboot_Cold,Node_Reboot_Checkpoint
+messages,10,0.8,1.69,1.21,2,8,0,True,Reboot : Cold -> Checkpoint,Node_Reboot_Cold,Node_Reboot_Checkpoint
+availability,10,17.14,14.75,10.55,8,2,0,True,Transitoire : NoRetry -> Retransmit,Node_Transient_NoRetry,Node_Transient_Retransmit
+messages,10,4.3,2.16,1.55,10,0,0,True,Transitoire : NoRetry -> Retransmit,Node_Transient_NoRetry,Node_Transient_Retransmit
+availability,10,38.57,30.15,21.57,9,1,0,True,Perte 30% : NoRetry -> Retransmit,Link_MsgLoss_NoRetry,Link_MsgLoss_Retransmit
+messages,10,8.1,3.78,2.71,10,0,0,True,Perte 30% : NoRetry -> Retransmit,Link_MsgLoss_NoRetry,Link_MsgLoss_Retransmit
+availability,10,12.86,4.52,3.23,9,1,0,True,Lien coupe court : NoRetry -> Retransmit,Link_Down_Temporary_NoRetry,Link_Down_Temporary
+messages,10,2.0,0.0,0.0,10,0,0,True,Lien coupe court : NoRetry -> Retransmit,Link_Down_Temporary_NoRetry,Link_Down_Temporary
+availability,10,20.0,18.07,12.93,10,0,0,True,Lien coupe : Retransmit -> Replication,Link_Down_Retransmit,Link_Down_Replication
+messages,10,4.6,1.9,1.36,10,0,0,True,Lien coupe : Retransmit -> Replication,Link_Down_Retransmit,Link_Down_Replication
+availability,10,1.43,4.52,3.23,1,9,0,True,Lien coupe : avec Z -> sans Z,Link_Down_Replication,Link_Down_Replication_NoZ
+messages,10,2.4,1.26,0.9,10,0,0,True,Lien coupe : avec Z -> sans Z,Link_Down_Replication,Link_Down_Replication_NoZ
+availability,10,0.0,0.0,0.0,0,10,0,True,Maillage : avec Z -> sans Z,Mesh_Baseline,Mesh_Baseline_NoZ
+messages,10,66.2,3.71,2.65,10,0,0,True,Maillage : avec Z -> sans Z,Mesh_Baseline,Mesh_Baseline_NoZ
