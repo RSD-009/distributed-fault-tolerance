@@ -186,6 +186,7 @@ void Node::saveCheckpoint()
 void Node::crashNow()
 {
     crashed = true;
+    crashedAt = simTime().dbl();
     getDisplayString().setTagArg("i", 1, "red");
     getDisplayString().setTagArg("i", 2, "80");
     bubble("CRASHED!");
@@ -197,6 +198,7 @@ void Node::crashNow()
 void Node::recoverNow()
 {
     crashed = false;
+    recoveredAt = simTime().dbl();
     bubble("RECOVERED");
     EV_INFO << "Node " << nodeId << ": RECOVERED at t=" << simTime() << "\n";
 
@@ -328,6 +330,7 @@ void Node::onRetxTimer(cMessage *msg)
         scheduleAt(simTime() + timeoutValue, msg);
     } else {
         unreachableNeighbors.insert(neighborId);
+        if (unreachableAt < 0) unreachableAt = simTime().dbl();
         saveCheckpoint();
         EV_WARN << "Node " << nodeId << ": neighbour " << neighborId
                 << " UNREACHABLE after " << maxRetries << " retries -- presumed crashed.\n";
@@ -397,6 +400,9 @@ void Node::finish()
     recordScalar("checkpointsSaved", checkpointsSaved);
     recordScalar("unreachableNeighbors", (long)unreachableNeighbors.size());
     recordScalar("crashed", crashed ? 1 : 0);
+    recordScalar("crashedAt", crashedAt);
+    recordScalar("recoveredAt", recoveredAt);
+    recordScalar("unreachableAt", unreachableAt);
     recordScalar("wasInitiator", isInitiator ? 1 : 0);
     recordScalar("wasCrashTarget", isCrashTarget ? 1 : 0);
 
