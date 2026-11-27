@@ -29,6 +29,9 @@ class Node : public cSimpleModule
     simtime_t crashTime;
     bool crashed = false;
     double informedAt = -1;
+    double crashedAt = -1;       // instant du crash
+    double recoveredAt = -1;     // instant du reboot
+    double unreachableAt = -1;   // instant du premier voisin declare injoignable
     cMessage *crashTimer = nullptr;
 
     simtime_t recoverTime;
