@@ -69,6 +69,7 @@ void Node::initialize()
 
     recoverTime = par("recoverTime");
     checkpointing = par("checkpointing");
+    useZ = par("useZ");
 
     buildNeighborTable();
 
@@ -136,7 +137,7 @@ void Node::onInformReceived(DiffuseMessage *msg)
             if (msg->getZ(j) == N[i])
                 existe = true;
         }
-        if (!existe)
+        if (useZ ? !existe : N[i] != senderId)
             Y.push_back(N[i]);
     }
 

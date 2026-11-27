@@ -20,6 +20,7 @@ simple Node
 
         double recoverTime @unit(s) = default(-1s);
         bool checkpointing = default(false);
+        bool useZ = default(true);   // true: diffuse-v3 (promesse Z), false: style v2 (tous les voisins sauf l'expediteur)
 
         @display("i=device/server");
     gates:
