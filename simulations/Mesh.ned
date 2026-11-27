@@ -6,7 +6,7 @@ network Mesh
         int numNodes = default(11);
         bool replication = default(false);
         int initiatorId = default(intuniform(0, numNodes-1));
-        int crashNodeId = default(intuniform(0, numNodes-1));
+        int crashNodeId = default((initiatorId + intuniform(1, numNodes-1)) % numNodes); // never the initiator
     submodules:
         node[numNodes]: Node {
             nodeId = index;

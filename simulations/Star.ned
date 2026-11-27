@@ -6,7 +6,7 @@ network Star
         int numNodes = default(7);
         bool replication = default(false);
         int initiatorId = default(intuniform(0, numNodes-1));
-        int crashNodeId = default(intuniform(0, numNodes-1));
+        int crashNodeId = default((initiatorId + intuniform(1, numNodes-1)) % numNodes); // never the initiator
         int partitionNodeId = default(intuniform(1, numNodes-1));
         int partitionParentId = default(0);
     submodules:

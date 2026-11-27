@@ -6,7 +6,7 @@ network Network
         int numNodes = default(7);
         bool replication = default(false);
         int initiatorId = default(intuniform(0, numNodes-1));
-        int crashNodeId = default(intuniform(0, numNodes-1));
+        int crashNodeId = default((initiatorId + intuniform(1, numNodes-1)) % numNodes); // never the initiator
         int partitionNodeId = default(3 + intuniform(0, 1)); // randomly node 3 or 4 -- the only two with a backup path
         int partitionParentId = default(int(floor((partitionNodeId-1)/2.0)));
     submodules:

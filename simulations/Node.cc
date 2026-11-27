@@ -73,12 +73,12 @@ void Node::initialize()
     buildNeighborTable();
 
     if (isCrashTarget && crashTime >= SIMTIME_ZERO) {
-        crashEvent = new cMessage("crash", CRASH_EVENT);
-        scheduleAt(crashTime, crashEvent);
+        crashTimer = new cMessage("crash timer", CRASH_TIMER);
+        scheduleAt(crashTime, crashTimer);
     }
     if (isCrashTarget && crashTime >= SIMTIME_ZERO && recoverTime > crashTime) {
-        recoverEvent = new cMessage("recover", RECOVER_EVENT);
-        scheduleAt(recoverTime, recoverEvent);
+        recoverTimer = new cMessage("reboot timer", RECOVER_TIMER);
+        scheduleAt(recoverTime, recoverTimer);
     }
 
     if (isInitiator) {
@@ -243,6 +243,7 @@ bool Node::linkIsCut(int neighborId)
 
 bool Node::isSilent()
 {
+    if (!isCrashTarget) return false;   // only the random victim of the run goes deaf
     if (silentStart < SIMTIME_ZERO) return false;
     return simTime() >= silentStart && simTime() < silentEnd;
 }
@@ -343,14 +344,14 @@ void Node::onAckReceived(cMessage *msg)
 
 void Node::handleMessage(cMessage *msg)
 {
-    if (msg->getKind() == CRASH_EVENT) {
-        crashEvent = nullptr;
+    if (msg->getKind() == CRASH_TIMER) {
+        crashTimer = nullptr;
         delete msg;
         crashNow();
         return;
     }
-    if (msg->getKind() == RECOVER_EVENT) {
-        recoverEvent = nullptr;
+    if (msg->getKind() == RECOVER_TIMER) {
+        recoverTimer = nullptr;
         delete msg;
         recoverNow();
         return;
@@ -400,8 +401,8 @@ void Node::finish()
 
     for (auto &kv : retxTimer)
         cancelAndDelete(kv.second);
-    if (crashEvent)
-        cancelAndDelete(crashEvent);
-    if (recoverEvent)
-        cancelAndDelete(recoverEvent);
+    if (crashTimer)
+        cancelAndDelete(crashTimer);
+    if (recoverTimer)
+        cancelAndDelete(recoverTimer);
 }
