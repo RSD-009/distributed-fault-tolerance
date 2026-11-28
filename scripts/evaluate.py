@@ -148,7 +148,7 @@ def summary_table(runs, order):
     g = runs.groupby("config")
     s = g.agg(runs=("run", "count"),
               avail=("availability", "mean"), avail_sd=("availability", "std"),
-              avail_alive=("availability_alive", "mean"),
+              avail_alive=("availability_alive", "mean"), alive_sd=("availability_alive", "std"),
               msgs=("messages", "mean"), msgs_sd=("messages", "std"),
               unreach=("unreachable", "mean"), ckpt=("checkpoints", "mean"),
               t_ms=("completion_ms", "mean")).fillna(0)
@@ -289,24 +289,61 @@ def savefig(name):
     print("  figure :", os.path.join(FIGS, name))
 
 
+# FIGURES V2 : barres d'erreur bornees a 100 %, valeurs ecrites, legendes hors des barres
+COL_A, COL_B = "#9aa0a6", "#3b7dd8"
+NAMES_FR = {"Tree": "Arbre", "Ring": "Anneau", "Star": "Étoile", "Mesh": "Maillage (n=11)"}
+
+
+def _clip_err(means, sds, top=100.0):
+    # erreurs asymetriques : la barre haute s'arrete a 100 % (une disponibilite ne depasse pas 100)
+    return [list(sds), [min(sd, max(top - m, 0.0)) for m, sd in zip(means, sds)]]
+
+
+def _label(ax, xs, vals, fmt, ups=None):
+    for i, (x, v) in enumerate(zip(xs, vals)):
+        up = ups[i] if ups else 0.0
+        ax.annotate(fmt % v, (x, v + up), xytext=(0, 3), textcoords="offset points",
+                    ha="center", fontsize=8)
+
+
+def _save(fig, name):
+    os.makedirs(FIGS, exist_ok=True)
+    path = os.path.join(FIGS, name)
+    fig.savefig(path, dpi=150, bbox_inches="tight")
+    plt.close(fig)
+    print("  figure :", path)
+
+
 def fig_pairs(s, metric, sd, ylabel, title, name, pairs):
     avail = [(a, b, t) for a, b, t in pairs if a in s.index and b in s.index]
     if not avail:
         return
-    plt.figure(figsize=(12, 5.5))
+    pct = metric == "avail"
+    fig, ax = plt.subplots(figsize=(13, 6))
     ticks = []
     for i, (a, b, t) in enumerate(avail):
         x = i * 3
-        plt.bar(x, s.loc[a, metric], yerr=s.loc[a, sd], capsize=3, color="#9aa0a6",
-                label="sans mecanisme" if i == 0 else None)
-        plt.bar(x + 1, s.loc[b, metric], yerr=s.loc[b, sd], capsize=3, color="#3b7dd8",
-                label="avec mecanisme" if i == 0 else None)
+        for dx, c, col, lab in ((0, a, COL_A, "avant la flèche (sans mécanisme, ou avec Z)"),
+                                (1, b, COL_B, "après la flèche (avec mécanisme, ou sans Z)")):
+            m, d = s.loc[c, metric], s.loc[c, sd]
+            err = _clip_err([m], [d]) if pct else [[d], [d]]
+            ax.bar(x + dx, m, yerr=err, capsize=3, color=col, label=lab if i == 0 else None)
+            _label(ax, [x + dx], [m], "%.1f", ups=[err[1][0]])
         ticks.append((x + 0.5, t.replace(" : ", "\n")))
-    plt.xticks([p for p, _ in ticks], [t for _, t in ticks], fontsize=8)
-    plt.ylabel(ylabel)
-    plt.title(title)
-    plt.legend()
-    savefig(name)
+    top = max(s.loc[c, metric] + s.loc[c, sd] for a, b, _ in avail for c in (a, b))
+    ax.set_ylim(0, 115 if pct else top * 1.12)
+    ax.set_xticks([p for p, _ in ticks])
+    ax.set_xticklabels([tt for _, tt in ticks], fontsize=9)
+    ax.set_ylabel(ylabel)
+    ax.set_title(title, pad=20)
+    if pct:
+        ax.axhline(100, color="gray", linestyle="--", linewidth=0.8)
+        note = "Disponibilité = nœuds informés / n (nœud crashé compris). Barres d'erreur : écart-type sur 10 runs, bornées à 100 %."
+    else:
+        note = "messagesSent = INFORM + ACK + retransmissions effectivement envoyés : un run qui atteint moins de nœuds envoie aussi moins de messages."
+    ax.text(0.5, 1.01, note, transform=ax.transAxes, ha="center", va="bottom", fontsize=8, color="dimgray")
+    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.14), ncol=2, frameon=False)
+    _save(fig, name)
 
 
 def fig_topologies(s):
@@ -319,62 +356,121 @@ def fig_topologies(s):
             seen.append(s.loc[c, "msgs"])
     if not names:
         return
-    fig, ax = plt.subplots(1, 2, figsize=(12, 5))
-    x = range(len(names))
-    ax[0].bar([i - 0.2 for i in x], seen, 0.4, color="#e08a2c", label="mesure (INFORM + ACK)")
-    ax[0].bar([i + 0.2 for i in x], bound, 0.4, color="#9aa0a6", label="2 x (2m - n + 1)  [cours]")
-    ax[0].set_xticks(list(x))
-    ax[0].set_xticklabels(names)
-    ax[0].set_ylabel("messages envoyes")
-    ax[0].set_title("Baseline : cout en messages par topologie")
-    ax[0].legend()
+    fig, ax = plt.subplots(1, 2, figsize=(12.5, 5.4))
+    x = list(range(len(names)))
+    ax[0].bar([i - 0.2 for i in x], seen, 0.4, color="#e08a2c", label="mesuré (INFORM + ACK)")
+    ax[0].bar([i + 0.2 for i in x], bound, 0.4, color=COL_A, label="2 × (2m − n + 1)  [borne du cours]")
+    _label(ax[0], [i - 0.2 for i in x], seen, "%.1f")
+    _label(ax[0], [i + 0.2 for i in x], bound, "%.0f")
+    ax[0].set_xticks(x)
+    ax[0].set_xticklabels([NAMES_FR[t] for t in names])
+    ax[0].set_ylabel("messages envoyés")
+    ax[0].set_ylim(0, max(bound) * 1.15)
+    ax[0].set_title("Sans panne : coût en messages par topologie")
+    ax[0].legend(loc="upper left", frameon=False)
+
     cn, ca, cs = [], [], []
     for t in TOPO:
         c = "Node_Crash_Timeout" if t == "Tree" else t + "_Node_Crash_Timeout"
         if c in s.index:
-            cn.append(t); ca.append(s.loc[c, "avail"]); cs.append(s.loc[c, "avail_sd"])
-    ax[1].bar(cn, ca, yerr=cs, capsize=3, color="#3b7dd8")
+            cn.append(NAMES_FR[t])
+            ca.append(s.loc[c, "avail_alive"])
+            cs.append(s.loc[c, "alive_sd"] if "alive_sd" in s.columns else 0.0)
+    err = _clip_err(ca, cs)
+    ax[1].bar(cn, ca, yerr=err, capsize=3, color=COL_B)
+    _label(ax[1], list(range(len(cn))), ca, "%.1f %%", ups=err[1])
     ax[1].axhline(100, color="gray", linestyle="--", linewidth=0.8)
-    ax[1].set_ylabel("disponibilite (% de noeuds informes)")
-    ax[1].set_title("Crash d'un noeud aleatoire : effet de la topologie")
-    savefig("eval_3_topologies.png")
+    ax[1].set_ylim(0, 115)
+    ax[1].set_ylabel("nœuds non crashés informés (%)")
+    ax[1].set_title("Crash d'un nœud aléatoire (10 runs) : effet de la topologie")
+    _save(fig, "eval_3_topologies.png")
 
 
 def fig_z(s):
-    if not ({"Link_Down_Replication", "Link_Down_Replication_NoZ"} <= set(s.index)
-            or {"Mesh_Baseline", "Mesh_Baseline_NoZ"} <= set(s.index)):
+    have_a = {"Link_Down_Replication", "Link_Down_Replication_NoZ"} <= set(s.index)
+    have_b = {"Mesh_Baseline", "Mesh_Baseline_NoZ"} <= set(s.index)
+    if not (have_a or have_b):
         return
-    fig, ax = plt.subplots(1, 2, figsize=(11, 5))
-    if {"Link_Down_Replication", "Link_Down_Replication_NoZ"} <= set(s.index):
+    cols = ["#e08a2c", "#4aa36b"]
+    fig, ax = plt.subplots(1, 2, figsize=(11.5, 5.4))
+    csv_path = os.path.join(RESULTS, "z_truth_table.csv")
+    if os.path.exists(csv_path):
+        # table de verite exacte (figure_z_table.py) : plus parlante que 10 runs tires au hasard
+        t = pd.read_csv(csv_path)
+        rates = [100.0 * (t[t.config == c].disponibilite_pct < 100).mean()
+                 for c in ("Link_Down_Replication", "Link_Down_Replication_NoZ")]
+        ax[0].bar(["avec Z (v3)", "sans Z (v2)"], rates, color=cols)
+        _label(ax[0], [0, 1], rates, "%.1f %%")
+        ax[0].set_ylim(0, 40)
+        ax[0].set_ylabel("cas en échec (%)")
+        ax[0].set_title("Robustesse : lien coupé + liens de secours\n14 cas exacts (7 initiateurs × 2 liens)")
+    elif have_a:
         a = ["Link_Down_Replication", "Link_Down_Replication_NoZ"]
-        ax[0].bar(["avec Z (v3)", "sans Z (v2)"], [s.loc[c, "avail"] for c in a],
-                  yerr=[s.loc[c, "avail_sd"] for c in a], capsize=3, color=["#e08a2c", "#4aa36b"])
-        ax[0].axhline(100, color="gray", linestyle="--", linewidth=0.8)
-        ax[0].set_ylabel("disponibilite (%)")
-        ax[0].set_title("Robustesse : lien coupe + liens de secours")
-    if {"Mesh_Baseline", "Mesh_Baseline_NoZ"} <= set(s.index):
+        means = [s.loc[c, "avail"] for c in a]
+        err = _clip_err(means, [s.loc[c, "avail_sd"] for c in a])
+        ax[0].bar(["avec Z (v3)", "sans Z (v2)"], means, yerr=err, capsize=3, color=cols)
+        _label(ax[0], [0, 1], means, "%.1f %%", ups=err[1])
+        ax[0].set_ylim(0, 115)
+        ax[0].set_ylabel("disponibilité (%)")
+        ax[0].set_title("Robustesse : lien coupé + liens de secours (10 runs tirés)")
+    if have_b:
         a = ["Mesh_Baseline", "Mesh_Baseline_NoZ"]
-        ax[1].bar(["avec Z (v3)", "sans Z (v2)"], [s.loc[c, "msgs"] for c in a],
-                  yerr=[s.loc[c, "msgs_sd"] for c in a], capsize=3, color=["#e08a2c", "#4aa36b"])
-        ax[1].axhline(104, color="gray", linestyle="--", linewidth=0.8, label="2 x 52 (borne v2)")
-        ax[1].legend()
-        ax[1].set_ylabel("messages envoyes")
-        ax[1].set_title("Cout : maillage sans panne")
-    fig.suptitle("Le prix de la robustesse : promesse Z")
-    savefig("eval_4_prix_de_Z.png")
+        vals = [s.loc[c, "msgs"] for c in a]
+        sds = [s.loc[c, "msgs_sd"] for c in a]
+        ax[1].bar(["avec Z (v3)", "sans Z (v2)"], vals, yerr=sds, capsize=3, color=cols)
+        _label(ax[1], [0, 1], vals, "%.1f", ups=sds)
+        ax[1].axhline(104, color="gray", linestyle="--", linewidth=0.8, label="borne v2 : 2 × 52 = 104")
+        ax[1].set_ylim(0, 125)
+        ax[1].set_ylabel("messages envoyés")
+        ax[1].set_title("Coût : maillage sans panne")
+        ax[1].legend(loc="upper left", frameon=False)
+    fig.suptitle("Le prix de la robustesse : la promesse Z", y=1.02)
+    _save(fig, "eval_4_prix_de_Z.png")
 
 
 def fig_recovery(rec):
-    if rec.empty or rec["delai_moyen_impactes_ms"].isna().all():
+    # un point par run (pas seulement une moyenne) : on voit les delais par paliers de timeout
+    path = os.path.join(RESULTS, "runs_detail.csv")
+    if not os.path.exists(path):
         return
-    plt.figure(figsize=(8, 5))
-    plt.bar(rec["config"], rec["delai_moyen_impactes_ms"].fillna(0), color="#4aa36b")
-    plt.axhline(50, color="gray", linestyle="--", linewidth=0.8, label="timeout = 50 ms")
-    plt.ylabel("delai moyen sur les runs impactes (ms)")
-    plt.title("Delai de recovery apparie au Baseline")
-    plt.xticks(rotation=15, fontsize=8)
-    plt.legend()
-    savefig("eval_5_recovery.png")
+    runs = pd.read_csv(path)
+    if "Baseline" not in set(runs.config):
+        return
+    base = runs[runs.config == "Baseline"].set_index("run")
+    cfgs = [("Node_Transient_Retransmit", "Transitoire\n(nœud sourd)"),
+            ("Link_Down_Temporary", "Lien coupé\n4 à 70 ms"),
+            ("Link_MsgLoss_Retransmit", "Perte 30 %")]
+    fig, ax = plt.subplots(figsize=(8.5, 5.6))
+    shown = []
+    for j, (cfg, lab) in enumerate(cfgs):
+        r = runs[runs.config == cfg].set_index("run")
+        d = []
+        for k in r.index.intersection(base.index):
+            if r.loc[k, "initiator"] == base.loc[k, "initiator"] and r.loc[k, "availability"] == 100:
+                x = r.loc[k, "completion_ms"] - base.loc[k, "completion_ms"]
+                if x == x:
+                    d.append(float(x))
+        if not d:
+            continue
+        d.sort()
+        jit = [(i - (len(d) - 1) / 2) * 0.04 for i in range(len(d))]
+        ax.scatter([j + e for e in jit], d, color="#4aa36b", edgecolor="black", s=45, zorder=3)
+        mean = sum(d) / len(d)
+        ax.hlines(mean, j - 0.3, j + 0.3, color="black", linewidth=2, zorder=4)
+        ax.text(j + 0.32, mean, "moy. %.0f ms" % mean, va="center", fontsize=9)
+        shown.append(lab)
+    for k in (50, 100, 150):
+        ax.axhline(k, linestyle="--", color="gray", linewidth=0.8)
+        ax.text(len(cfgs) - 0.45, k + 2, "%d timeout(s) = %d ms" % (k // 50, k), fontsize=8, color="dimgray")
+    ax.set_xticks(range(len(cfgs)))
+    ax.set_xticklabels([lab for _, lab in cfgs])
+    ax.set_ylim(-10, 180)
+    ax.set_xlim(-0.5, len(cfgs) - 0.2)
+    ax.set_ylabel("fin de diffusion − fin de diffusion du Baseline (ms)")
+    ax.set_title("Délai de recovery par run (même run que le Baseline)", pad=18)
+    ax.text(0.5, 1.01, "Un point = un run ; 0 ms = run non touché par la faute ; trait noir = moyenne",
+            transform=ax.transAxes, ha="center", va="bottom", fontsize=8, color="dimgray")
+    _save(fig, "eval_5_recovery.png")
 
 
 # ----------------------------------------------------------------------------
